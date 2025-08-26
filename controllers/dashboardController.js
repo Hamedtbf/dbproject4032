@@ -177,3 +177,32 @@ exports.cancelTicket = async (req, res) => {
         connection.release();
     }
 };
+
+exports.getBuys = async (req, res) => {
+    try {
+        // This query joins Payment, Reservation, and Ticket tables
+        // to get details of all successfully paid tickets for the logged-in user.
+        const sql = `
+            SELECT 
+                r.id as reservation_id,
+                t.source,
+                t.destination,
+                t.departure_date,
+                t.departure_time,
+                p.price,
+                p.payment_time
+            FROM Payment p
+            JOIN Reservation r ON p.reservation_id = r.id
+            JOIN Ticket t ON r.ticket_id = t.id
+            WHERE r.user_id = ? AND p.status = 'successful'
+            ORDER BY p.payment_time DESC
+        `;
+        
+        const [buys] = await dbPool.query(sql, [req.user.id]);
+        
+        res.status(200).json({ status: 'success', data: { buys } });
+
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: 'Failed to fetch purchase history.', error: err.message });
+    }
+};
