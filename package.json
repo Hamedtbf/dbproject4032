@@ -1,5 +1,5 @@
 {
-  "name": "dbproject4032",
+  "name": "backend",
   "version": "1.0.0",
   "description": "API for a ticket reservation system",
   "main": "server.js",
