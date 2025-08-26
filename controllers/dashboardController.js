@@ -1,10 +1,9 @@
 const mysql = require('mysql2/promise');
-const redis = require('redis');
+const redisClient = require('../config/redisClient');
 require('dotenv').config();
 
 const dbPool = mysql.createPool({ host: process.env.DB_HOST, user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: process.env.DB_NAME });
-const redisClient = redis.createClient({ url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}` });
-if (!redisClient.isOpen) { redisClient.connect(); }
+
 
 exports.editProfile = async (req, res) => {
     const { firstName, lastName, email, city } = req.body;
@@ -180,8 +179,6 @@ exports.cancelTicket = async (req, res) => {
 
 exports.getBuys = async (req, res) => {
     try {
-        // This query joins Payment, Reservation, and Ticket tables
-        // to get details of all successfully paid tickets for the logged-in user.
         const sql = `
             SELECT 
                 r.id as reservation_id,
@@ -210,26 +207,14 @@ exports.getBuys = async (req, res) => {
 exports.createReport = async (req, res) => {
     const { reservation_id, category, description } = req.body;
     const user_id = req.user.id;
-
-    // Basic validation
     if (!reservation_id || !category || !description) {
         return res.status(400).json({ status: 'fail', message: 'Please provide all required fields for the report.' });
     }
-
     try {
-        const newReport = {
-            user_id,
-            reservation_id,
-            category,
-            description
-        };
-
+        const newReport = { user_id, reservation_id, category, description };
         await dbPool.query('INSERT INTO Report SET ?', newReport);
-        
         res.status(201).json({ status: 'success', message: 'Report submitted successfully.' });
-
     } catch (err) {
-        // Handle cases where the reservation_id might not exist or other DB errors
         res.status(500).json({ status: 'error', message: 'Failed to submit report.', error: err.message });
     }
 };

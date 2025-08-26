@@ -1,14 +1,11 @@
 const mysql = require('mysql2/promise');
-const redis = require('redis');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const redisClient = require('../config/redisClient');
 require('dotenv').config();
 
 const dbPool = mysql.createPool({ host: process.env.DB_HOST, user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: process.env.DB_NAME });
-const redisClient = redis.createClient({ url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}` });
-if (!redisClient.isOpen) { redisClient.connect(); }
 
-// --- Utility Functions ---
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 const signToken = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
 
@@ -24,7 +21,6 @@ const createSendToken = (user, statusCode, res) => {
     res.status(statusCode).json({ status: 'success', token, data: { user } });
 };
 
-// --- Controller Functions ---
 exports.signup = async (req, res) => {
     const { firstName, lastName, email, password, city } = req.body;
     if (!firstName || !lastName || !email || !password || !city) {
@@ -73,12 +69,9 @@ exports.verifyOtp = async (req, res) => {
         if (!user) {
             return res.status(404).json({ status: 'fail', message: 'User not found.' });
         }
-
         const storedOtp = await redisClient.get(`otp:${user.id}`);
         if (storedOtp === otp) {
-            // OTP is correct, clear it from Redis
             await redisClient.del(`otp:${user.id}`);
-            // Send back user role for redirection
             res.status(200).json({ status: 'success', message: 'OTP verified.', data: { role: user.role } });
         } else {
             res.status(400).json({ status: 'fail', message: 'Invalid or expired OTP.' });
