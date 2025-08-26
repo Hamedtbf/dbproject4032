@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # This is our MySQL database service.
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-ticket-db
+    restart: unless-stopped # The container will restart automatically unless you manually stop it.
+    environment:
+      MYSQL_ROOT_PASSWORD: Mysql2025
+      MYSQL_DATABASE: ticket_reservation
+    ports:
+      - "3306:3306"
+    # volumes:
+    #   # This ensures that your database data persists even if the container is removed.
+    #   # - mysql-data:/var/lib/mysql
+
+  # This is our Redis caching service.
+  redis-cache:
+    image: redis:7-alpine
+    container_name: redis-ticket-cache
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    # volumes:
+    #   - redis-data:/data
+
+# Defines the volumes that Docker will manage for data persistence.
+# volumes:
+#   mysql-data:
+#   redis-data:
+
