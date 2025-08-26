@@ -22,13 +22,13 @@ const createSendToken = (user, statusCode, res) => {
 };
 
 exports.signup = async (req, res) => {
-    const { firstName, lastName, email, password, city } = req.body;
-    if (!firstName || !lastName || !email || !password || !city) {
+    const { firstName, lastName, email, password, city, balance } = req.body;
+    if (!firstName || !lastName || !email || !password || !city || balance === undefined) {
         return res.status(400).json({ status: 'fail', message: 'Please provide all required fields.' });
     }
     try {
         const hashedPassword = await bcrypt.hash(password, 12);
-        const newUser = { firstName, lastName, email, password: hashedPassword, city };
+        const newUser = { firstName, lastName, email, password: hashedPassword, city, balance };
         const [result] = await dbPool.query('INSERT INTO User SET ?', newUser);
         const insertedUser = { id: result.insertId, ...newUser, role: 'customer' };
         createSendToken(insertedUser, 201, res);
