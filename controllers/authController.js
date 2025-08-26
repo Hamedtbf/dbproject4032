@@ -31,11 +31,6 @@ exports.signup = async (req, res) => {
         return res.status(400).json({ status: 'fail', message: 'Please provide all required fields.' });
     }
     try {
-        const [result] = await dbPool.query('SELECT id FROM User WHERE id')
-    } catch (err) {
-
-    }
-    try {
         const hashedPassword = await bcrypt.hash(password, 12);
         const newUser = { firstName, lastName, email, password: hashedPassword, city };
         const [result] = await dbPool.query('INSERT INTO User SET ?', newUser);
