@@ -1,0 +1,42 @@
+<div class="container">
+  <div class="nav">
+    <button routerLink="/admin">Back to Admin Panel</button>
+  </div>
+
+  <h2>Manage All User Reservations</h2>
+
+  <p *ngIf="message" class="message">{{ message }}</p>
+
+  <table *ngIf="reservations.length > 0">
+    <thead>
+      <tr>
+        <th>Res ID</th>
+        <th>User ID</th>
+        <th>Ticket ID</th>
+        <th>Status</th>
+        <th>Reserve Time</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let res of reservations">
+        <td>{{ res.id }}</td>
+        <td>{{ res.user_id }}</td>
+        <td>{{ res.ticket_id }}</td>
+        <td>
+          <!-- Bind the select dropdown to the reservation's status -->
+          <select [(ngModel)]="res.status">
+            <option value="reserved">reserved</option>
+            <option value="paid">paid</option>
+            <option value="canceled">canceled</option>
+          </select>
+        </td>
+        <td>{{ res.reserve_time | date:'medium' }}</td>
+        <td>
+          <button (click)="updateStatus(res.id, res.status)">Save Change</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+   <p *ngIf="!reservations.length && !isLoading">No reservations found.</p>
+</div>

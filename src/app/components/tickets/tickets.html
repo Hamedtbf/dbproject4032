@@ -1,0 +1,74 @@
+<div class="container">
+  <div class="nav">
+    <button routerLink="/dashboard">Back to Dashboard</button>
+  </div>
+
+  <h2>Search for Available Tickets</h2>
+
+  <!-- Search Filter UI -->
+  <div class="filters">
+    <div class="form-group">
+      <label for="source">From</label>
+      <input id="source" [(ngModel)]="filters.source" placeholder="e.g., New York">
+    </div>
+    <div class="form-group">
+      <label for="destination">To</label>
+      <input id="destination" [(ngModel)]="filters.destination" placeholder="e.g., Boston">
+    </div>
+    <div class="form-group">
+      <label for="departure_date">Departure Date</label>
+      <input id="departure_date" type="date" [(ngModel)]="filters.departure_date">
+    </div>
+    <button (click)="search()">Search Tickets</button>
+  </div>
+
+  <!-- Message Area -->
+  <p *ngIf="message" class="message">{{ message }}</p>
+
+  <!-- Tickets Results Table -->
+  <table *ngIf="tickets.length > 0">
+    <thead>
+      <tr>
+        <th>From</th>
+        <th>To</th>
+        <th>Departure</th>
+        <th>Price</th>
+        <th>Company</th>
+        <th>Remaining</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let ticket of tickets">
+        <td>{{ ticket.source }}</td>
+        <td>{{ ticket.destination }}</td>
+        <td>{{ ticket.departure_date | date }} {{ ticket.departure_time }}</td>
+        <td>${{ ticket.price }}</td>
+        <td>{{ ticket.company_name }}</td>
+        <td>{{ ticket.remaining_cap }}</td>
+        <td>
+          <button (click)="viewDetails(ticket.id)">Details</button>
+          <button (click)="reserve(ticket.id)">Reserve</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p *ngIf="tickets.length === 0 && hasSearched">No tickets found for the selected criteria.</p>
+
+  <!-- Details Modal -->
+  <div class="modal-backdrop" *ngIf="selectedTicketDetails">
+    <div class="modal">
+      <h3>Ticket Details</h3>
+      <p><strong>Route:</strong> {{ selectedTicketDetails.source }} to {{ selectedTicketDetails.destination }}</p>
+      <p><strong>Company:</strong> {{ selectedTicketDetails.company_name }}</p>
+      <p><strong>Departure:</strong> {{ selectedTicketDetails.departure_date | date }} at {{ selectedTicketDetails.departure_time }}</p>
+      <p><strong>Arrival:</strong> {{ selectedTicketDetails.arrival_date | date }} at {{ selectedTicketDetails.arrival_time }}</p>
+      <p><strong>Price:</strong> ${{ selectedTicketDetails.price }}</p>
+      <p><strong>Vehicle:</strong> {{ selectedTicketDetails.vehicle_type }}</p>
+
+      <!-- Vehicle-specific details would go here if available -->
+
+      <button (click)="selectedTicketDetails = null" class="secondary">Close</button>
+    </div>
+  </div>
+</div>

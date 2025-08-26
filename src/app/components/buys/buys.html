@@ -1,0 +1,61 @@
+<div class="container">
+  <div class="nav">
+    <button routerLink="/dashboard">Back to Dashboard</button>
+  </div>
+
+  <h2>My Purchase History</h2>
+
+  <p *ngIf="message" class="message">{{ message }}</p>
+
+  <div *ngIf="!boughtTickets.length && !isLoading">
+    <p>You have not purchased any tickets yet.</p>
+  </div>
+
+  <table *ngIf="boughtTickets.length > 0">
+    <thead>
+      <tr>
+        <th>From</th>
+        <th>To</th>
+        <th>Departure</th>
+        <th>Price</th>
+        <th>Purchase Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let ticket of boughtTickets">
+        <td>{{ ticket.source }}</td>
+        <td>{{ ticket.destination }}</td>
+        <td>{{ ticket.departure_date | date }} {{ ticket.departure_time }}</td>
+        <td>${{ ticket.price }}</td>
+        <td>{{ ticket.payment_time | date:'medium' }}</td>
+        <td>
+          <button (click)="cancel(ticket.reservation_id)">Cancel & Refund</button>
+          <button (click)="showReportForm(ticket)" class="secondary">Report Issue</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Report Form Modal -->
+  <div class="modal-backdrop" *ngIf="reportingTicket">
+    <div class="modal">
+      <h3>Report an Issue for Ticket: {{ reportingTicket.source }} to {{ reportingTicket.destination }}</h3>
+      <div class="form-group">
+        <label for="category">Category</label>
+        <select id="category" [(ngModel)]="report.category">
+          <option value="delay">Delay</option>
+          <option value="payment_issue">Problem in Payment</option>
+          <option value="cancellation">Cancellation Issue</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" rows="4" [(ngModel)]="report.description" placeholder="Please describe the issue in detail."></textarea>
+      </div>
+      <button (click)="submitReport()">Submit Report</button>
+      <button (click)="closeReportForm()" class="secondary" style="margin-left: 10px;">Cancel</button>
+    </div>
+  </div>
+</div>

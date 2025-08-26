@@ -1,0 +1,39 @@
+<div class="container">
+  <div class="nav">
+    <button routerLink="/dashboard">Back to Dashboard</button>
+  </div>
+
+  <h2>My Pending Reservations</h2>
+  <p>These tickets are held for you for a limited time. Please complete the payment to confirm your booking.</p>
+
+  <!-- Message Area -->
+  <p *ngIf="message" class="message">{{ message }}</p>
+
+  <div *ngIf="!reservations.length">
+    <p>You have no pending reservations.</p>
+  </div>
+
+  <table *ngIf="reservations.length">
+    <thead>
+      <tr>
+        <th>Reservation ID</th>
+        <th>Status</th>
+        <th>Reserved At</th>
+        <th>Expires At</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- We only show reservations with the status 'reserved' -->
+      <tr *ngFor="let res of reservations">
+        <td>{{ res.id }}</td>
+        <td>{{ res.status }}</td>
+        <td>{{ res.reserve_time | date:'medium' }}</td>
+        <td>{{ res.expire_time | date:'medium' }}</td>
+        <td>
+          <button (click)="pay(res.id)">Pay Now</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

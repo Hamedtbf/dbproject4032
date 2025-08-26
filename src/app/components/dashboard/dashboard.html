@@ -1,0 +1,16 @@
+<div class="container">
+  <h2>User Dashboard</h2>
+  <p>Welcome! From here you can manage your trips.</p>
+
+  <div class="nav">
+    <button routerLink="/tickets">Search for Tickets</button>
+    <button routerLink="/reservations">My Pending Reservations</button>
+    <button routerLink="/buys">My Purchase History</button>
+    <button (click)="logout()" class="secondary">Logout</button>
+  </div>
+
+  <div class="content">
+    <!-- You could add summary information or welcome messages here in the future -->
+    <p>Select an option above to get started.</p>
+  </div>
+</div>
