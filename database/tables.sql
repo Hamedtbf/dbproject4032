@@ -1,6 +1,6 @@
--- Schema with corrections for table creation errors only.
--- Data types are kept as originally specified, with INT(1) changed to TINYINT(1) for boolean-like fields.
--- Added default CURRENT_TIMESTAMP for DATETIME columns.
+CREATE DATABASE IF NOT EXISTS ticket_reservation;
+
+USE ticket_reservation;
 
 CREATE TABLE User (
     id INT NOT NULL AUTO_INCREMENT,
@@ -11,7 +11,7 @@ CREATE TABLE User (
     city VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     accountState TINYINT(1) NOT NULL DEFAULT 1, -- 1 means active, 0 means inactive
-    registerDate DATE NOT NULL DEFAULT CURRENT_DATE,
+    registerDate DATE NOT NULL DEFAULT (CURRENT_DATE),
     balance INT NOT NULL,
     PRIMARY KEY(id)
 );
@@ -23,36 +23,31 @@ CREATE TABLE Class (
 );
 
 CREATE TABLE Company (
-    id INT NOT NULL AUTO_INCREMENT, -- Added AUTO_INCREMENT to allow creation
+    id INT NOT NULL AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     PRIMARY KEY(id)
 );
 
--- Main table for all tickets.
--- Fixed missing commas and incorrect foreign key references.
--- Changed class_id to INT to match the Class(id) it references, which is required to prevent a creation error.
 CREATE TABLE Ticket (
     id INT NOT NULL AUTO_INCREMENT,
-    vehicle_type VARCHAR NOT NULL,
+    vehicle_type VARCHAR(255) NOT NULL,
     source VARCHAR(255) NOT NULL,
     destination VARCHAR(255) NOT NULL,
-    arrival_date DATE NOT NULL DEFAULT CURRENT_DATE
-    arrival_time TIME NOT NULL DEFAULT CURRENT_TIME,
-    departure_date DATE NOT NULL DEFAULT CURRENT_DATE,
-    departue_time DATE NOT NULL DEFAULT CURRENT_TIME,
+    arrival_date DATE NOT NULL DEFAULT (CURRENT_DATE),
+    arrival_time TIME NOT NULL DEFAULT (CURRENT_TIME),
+    departure_date DATE NOT NULL DEFAULT (CURRENT_DATE),
+    departure_time TIME NOT NULL DEFAULT (CURRENT_TIME),
     price INT NOT NULL,
     remaining_cap INT NOT NULL,
     company_id INT NOT NULL,
-    class_id INT NOT NULL, -- This MUST be INT to reference Class(id)
+    class_id INT NOT NULL,
     PRIMARY KEY(id),
     CONSTRAINT fk_ticket_company FOREIGN KEY (company_id) REFERENCES Company(id),
     CONSTRAINT fk_ticket_class FOREIGN KEY (class_id) REFERENCES Class(id),
     INDEX idx_source_dest (source, destination),
-    INDEX idx_departure_time (departure_time)
+    INDEX idx_departure (departure_date, departure_time)
 );
 
-
--- Corrected typo 'CONSTAINT' and table reference 'ticket' to 'Ticket'.
 CREATE TABLE TrainDetails (
     ticket_id INT NOT NULL,
     stars INT NOT NULL,
@@ -64,7 +59,6 @@ CREATE TABLE TrainDetails (
     CONSTRAINT fk_train_ticket FOREIGN KEY (ticket_id) REFERENCES Ticket(id)
 );
 
--- Corrected typo 'CONSTAINT' and table reference 'ticket' to 'Ticket'.
 CREATE TABLE FlightDetails (
     ticket_id INT NOT NULL,
     flight_class VARCHAR(255) NOT NULL, -- economy, business, first class
@@ -79,7 +73,6 @@ CREATE TABLE FlightDetails (
     CONSTRAINT fk_flight_ticket FOREIGN KEY (ticket_id) REFERENCES Ticket(id)
 );
 
--- Corrected typo 'CONSTAINT' and table reference 'ticket' to 'Ticket'.
 CREATE TABLE BusDetails (
     ticket_id INT NOT NULL,
     bus_class VARCHAR(255) NOT NULL, -- VIP, normal
@@ -91,8 +84,6 @@ CREATE TABLE BusDetails (
     CONSTRAINT fk_bus_ticket FOREIGN KEY (ticket_id) REFERENCES Ticket(id)
 );
 
--- Fixed missing comma and incorrect foreign key references.
--- Note: Using an expression for a DEFAULT value requires MySQL 8.0.13+ or MariaDB 10.2.1+.
 CREATE TABLE Reservation (
     id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
@@ -106,7 +97,6 @@ CREATE TABLE Reservation (
     INDEX idx_user_id (user_id)
 );
 
--- Fixed missing comma and incorrect foreign key reference.
 CREATE TABLE Payment (
     id INT NOT NULL AUTO_INCREMENT,
     reservation_id INT NOT NULL,
@@ -118,7 +108,6 @@ CREATE TABLE Payment (
     CONSTRAINT fk_payment_res FOREIGN KEY (reservation_id) REFERENCES Reservation(id)
 );
 
--- Fixed missing commas and incorrect foreign key references.
 CREATE TABLE Report (
     id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
