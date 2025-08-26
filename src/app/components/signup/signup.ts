@@ -18,7 +18,8 @@ export class Signup {
     lastName: '',
     email: '',
     password: '',
-    city: ''
+    city: '',
+    balance: 0
   };
   error = '';
 

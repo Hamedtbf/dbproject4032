@@ -26,6 +26,11 @@
     <input id="city" [(ngModel)]="userData.city" name="city" required>
   </div>
 
+  <div class="form-group">
+    <label for="balance">Initial Balance</label>
+    <input id="balance" type="number" [(ngModel)]="userData.balance" name="balance" required>
+  </div>
+
   <button (click)="signup()">Sign Up</button>
 
   <p *ngIf="error" class="error">{{ error }}</p>
