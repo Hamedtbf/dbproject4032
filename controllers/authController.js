@@ -1,0 +1,71 @@
+const mysql = require('mysql2/promise');
+const redis = require('redis');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+require('dotenv').config();
+
+const dbPool = mysql.createPool({ host: process.env.DB_HOST, user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: process.env.DB_NAME });
+const redisClient = redis.createClient({ url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}` });
+if (!redisClient.isOpen) { redisClient.connect(); }
+
+// --- Utility Functions ---
+const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
+const signToken = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+
+const createSendToken = (user, statusCode, res) => {
+    const token = signToken(user.id);
+    const cookieOptions = {
+        expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+        httpOnly: true,
+        secure: false
+    };
+    res.cookie('jwt', token, cookieOptions);
+    user.password = undefined;
+    res.status(statusCode).json({ status: 'success', token, data: { user } });
+};
+
+// --- Controller Functions ---
+exports.signup = async (req, res) => {
+    const { firstName, lastName, email, password, city } = req.body;
+    if (!firstName || !lastName || !email || !password || !city) {
+        return res.status(400).json({ status: 'fail', message: 'Please provide all required fields.' });
+    }
+    try {
+        const [result] = await dbPool.query('SELECT id FROM User WHERE id')
+    } catch (err) {
+
+    }
+    try {
+        const hashedPassword = await bcrypt.hash(password, 12);
+        const newUser = { firstName, lastName, email, password: hashedPassword, city };
+        const [result] = await dbPool.query('INSERT INTO User SET ?', newUser);
+        const insertedUser = { id: result.insertId, ...newUser, role: 'customer' };
+        createSendToken(insertedUser, 201, res);
+    } catch (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({ status: 'fail', message: 'Email already exists.' });
+        }
+        res.status(500).json({ status: 'error', message: 'Could not sign up user.', error: err.message });
+    }
+};
+
+exports.login = async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).json({ status: 'fail', message: 'Please provide email and password.' });
+    }
+    try {
+        const [rows] = await dbPool.query('SELECT * FROM User WHERE email = ?', [email]);
+        const user = rows[0];
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).json({ status: 'fail', message: 'Incorrect email or password.' });
+        }
+        const otp = generateOTP();
+        const otpTTL = parseInt(process.env.OTP_TTL_SECONDS);
+        await redisClient.setEx(`otp:${user.id}`, otpTTL, otp);
+        console.log(`OTP for user ${user.email} is: ${otp} (valid for ${otpTTL / 60} minutes)`);
+        createSendToken(user, 200, res);
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: 'An error occurred during login.', error: err.message });
+    }
+};
