@@ -7,12 +7,11 @@ CREATE TABLE User (
     firstName VARCHAR(255) NOT NULL,
     lastName VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    role VARCHAR(255) NOT NULL,
-    registerDate DATE NOT NULL,
+    role VARCHAR(255) NOT NULL DEFAULT 'customer', -- customer, admin
     city VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
-    accountState TINYINT(1) NOT NULL, -- 1 means active, 0 means inactive
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    accountState TINYINT(1) NOT NULL DEFAULT 1, -- 1 means active, 0 means inactive
+    registerDate DATE NOT NULL DEFAULT CURRENT_DATE,
     balance INT NOT NULL,
     PRIMARY KEY(id)
 );
@@ -34,11 +33,13 @@ CREATE TABLE Company (
 -- Changed class_id to INT to match the Class(id) it references, which is required to prevent a creation error.
 CREATE TABLE Ticket (
     id INT NOT NULL AUTO_INCREMENT,
-    vehicle_type INT NOT NULL,
+    vehicle_type VARCHAR NOT NULL,
     source VARCHAR(255) NOT NULL,
     destination VARCHAR(255) NOT NULL,
-    arrival_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    departure_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    arrival_date DATE NOT NULL DEFAULT CURRENT_DATE
+    arrival_time TIME NOT NULL DEFAULT CURRENT_TIME,
+    departure_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    departue_time DATE NOT NULL DEFAULT CURRENT_TIME,
     price INT NOT NULL,
     remaining_cap INT NOT NULL,
     company_id INT NOT NULL,
@@ -96,7 +97,7 @@ CREATE TABLE Reservation (
     id INT NOT NULL AUTO_INCREMENT,
     user_id INT NOT NULL,
     ticket_id INT NOT NULL,
-    status VARCHAR(255) NOT NULL, -- reserved, paid, canceled, canceled by support
+    status VARCHAR(255) NOT NULL DEFAULT 'reserved', -- reserved, paid, canceled, canceled by support
     reserve_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     expire_time DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP + INTERVAL 10 MINUTE),
     PRIMARY KEY(id),
@@ -111,7 +112,7 @@ CREATE TABLE Payment (
     reservation_id INT NOT NULL,
     price INT NOT NULL,
     method VARCHAR(255) NOT NULL,
-    status VARCHAR(255) NOT NULL, -- successful, unsuccessful, pending
+    status VARCHAR(255) NOT NULL DEFAULT 'successful', -- successful, unsuccessful, returned
     payment_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(id),
     CONSTRAINT fk_payment_res FOREIGN KEY (reservation_id) REFERENCES Reservation(id)
@@ -124,7 +125,8 @@ CREATE TABLE Report (
     reservation_id INT NOT NULL,
     category VARCHAR(255) NOT NULL, -- delay, problem in payment, etc.
     description VARCHAR(255) NOT NULL,
-    status VARCHAR(255) NOT NULL, -- resolved, pending
+    status VARCHAR(255) NOT NULL DEFAULT 'pending', -- resolved, pending
+    response VARCHAR(255) NOT NULL DEFAULT '',
     PRIMARY KEY(id),
     CONSTRAINT fk_report_user FOREIGN KEY (user_id) REFERENCES User(id),
     CONSTRAINT fk_report_reservation FOREIGN KEY (reservation_id) REFERENCES Reservation(id)
