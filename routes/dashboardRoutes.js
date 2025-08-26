@@ -16,5 +16,6 @@ router.get('/reservations', dashboardController.getReservations);
 router.post('/payment', dashboardController.makePayment);
 router.put('/cancel', dashboardController.cancelTicket);
 router.get('/buys', dashboardController.getBuys);
+router.post('/report', dashboardController.createReport);
 
 module.exports = router;

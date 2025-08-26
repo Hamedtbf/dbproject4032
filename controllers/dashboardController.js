@@ -206,3 +206,30 @@ exports.getBuys = async (req, res) => {
         res.status(500).json({ status: 'error', message: 'Failed to fetch purchase history.', error: err.message });
     }
 };
+
+exports.createReport = async (req, res) => {
+    const { reservation_id, category, description } = req.body;
+    const user_id = req.user.id;
+
+    // Basic validation
+    if (!reservation_id || !category || !description) {
+        return res.status(400).json({ status: 'fail', message: 'Please provide all required fields for the report.' });
+    }
+
+    try {
+        const newReport = {
+            user_id,
+            reservation_id,
+            category,
+            description
+        };
+
+        await dbPool.query('INSERT INTO Report SET ?', newReport);
+        
+        res.status(201).json({ status: 'success', message: 'Report submitted successfully.' });
+
+    } catch (err) {
+        // Handle cases where the reservation_id might not exist or other DB errors
+        res.status(500).json({ status: 'error', message: 'Failed to submit report.', error: err.message });
+    }
+};
