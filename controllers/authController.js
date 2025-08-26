@@ -69,3 +69,26 @@ exports.login = async (req, res) => {
         res.status(500).json({ status: 'error', message: 'An error occurred during login.', error: err.message });
     }
 };
+
+exports.verifyOtp = async (req, res) => {
+    const { email, otp } = req.body;
+    try {
+        const [rows] = await dbPool.query('SELECT id, role FROM User WHERE email = ?', [email]);
+        const user = rows[0];
+        if (!user) {
+            return res.status(404).json({ status: 'fail', message: 'User not found.' });
+        }
+
+        const storedOtp = await redisClient.get(`otp:${user.id}`);
+        if (storedOtp === otp) {
+            // OTP is correct, clear it from Redis
+            await redisClient.del(`otp:${user.id}`);
+            // Send back user role for redirection
+            res.status(200).json({ status: 'success', message: 'OTP verified.', data: { role: user.role } });
+        } else {
+            res.status(400).json({ status: 'fail', message: 'Invalid or expired OTP.' });
+        }
+    } catch (err) {
+        res.status(500).json({ status: 'error', message: 'An error occurred during OTP verification.', error: err.message });
+    }
+};
