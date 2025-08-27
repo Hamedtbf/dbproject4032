@@ -28,4 +28,5 @@ export const routes: Routes = [
   { path: 'admin', component: AdminPanel, canActivate: [authGuard] },
   { path: 'admin/reservations', component: AdminReservations, canActivate: [authGuard] },
   { path: 'admin/reports', component: AdminReports, canActivate: [authGuard] },
+  { path: 'profile', component: EditProfile, canActivate: [authGuard] },
 ];
