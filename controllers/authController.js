@@ -31,6 +31,12 @@ exports.signup = async (req, res) => {
         const newUser = { firstName, lastName, email, password: hashedPassword, city, balance };
         const [result] = await dbPool.query('INSERT INTO User SET ?', newUser);
         const insertedUser = { id: result.insertId, ...newUser, role: 'customer' };
+
+        const otp = generateOTP();
+        const otpTTL = parseInt(process.env.OTP_TTL_SECONDS);
+        await redisClient.setEx(`otp:${insertedUser.id}`, otpTTL, otp);
+        console.log(`OTP for new user ${insertedUser.email} is: ${otp} (valid for ${otpTTL / 60} minutes)`);
+
         createSendToken(insertedUser, 201, res);
     } catch (err) {
         if (err.code === 'ER_DUP_ENTRY') {
