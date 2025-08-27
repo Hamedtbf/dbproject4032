@@ -7,6 +7,7 @@ const router = express.Router();
 // Protect all routes after this middleware
 router.use(protect);
 
+router.get('/profile', dashboardController.getProfile);
 router.put('/editprofile', dashboardController.editProfile);
 router.get('/cities', dashboardController.getCities);
 router.get('/tickets', dashboardController.getTickets);

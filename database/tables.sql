@@ -101,7 +101,7 @@ CREATE TABLE Payment (
     id INT NOT NULL AUTO_INCREMENT,
     reservation_id INT NOT NULL,
     price INT NOT NULL,
-    method VARCHAR(255) NOT NULL,
+    method VARCHAR(255) NOT NULL, -- wallet, payment gateaway
     status VARCHAR(255) NOT NULL DEFAULT 'successful', -- successful, unsuccessful, returned
     payment_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(id),

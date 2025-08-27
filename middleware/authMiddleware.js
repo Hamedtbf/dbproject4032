@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
-const dbPool = require('../config/db'); // Import the shared pool
+const dbPool = require('../config/db');
 require('dotenv').config();
 
 exports.protect = async (req, res, next) => {

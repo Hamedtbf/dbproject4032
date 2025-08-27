@@ -32,16 +32,20 @@ INSERT INTO Ticket (vehicle_type, source, destination, arrival_date, arrival_tim
 ('bus', 'شیراز', 'اصفهان', '2025-09-11', '19:00:00', '2025-09-11', '13:00:00', 220000, 15, 4, 1);    -- Hamsafar, Economy
 
 INSERT INTO FlightDetails (ticket_id, flight_class, stops, flight_number, source_airport, destination_airport, has_bed, has_service, has_internet) VALUES
-(1, 'Business', 0, 452, 'IKA', 'MHD', 0, 1, 1),
-(3, 'Economy', 0, 102, 'SYZ', 'THR', 0, 1, 0);
+(1, 'First Class', 0, 452, 'IKA', 'MHD', 1, 1, 1),
+(2, 'Economy', 1, 202, 'MHD', 'IKA', 0, 1, 0),
+(3, 'Business', 0, 102, 'SYZ', 'THR', 0, 1, 1);
 
 
 INSERT INTO TrainDetails (ticket_id, stars, has_bed, has_service, has_internet, has_condition) VALUES
 (4, 4, 1, 1, 0, 1),
-(5, 5, 1, 1, 1, 1);
+(5, 5, 1, 1, 1, 1),
+(6, 3, 1, 0, 0, 1);
 
 
 INSERT INTO BusDetails (ticket_id, bus_class, seats_in_row, has_condition, has_service, has_monitor) VALUES
 (7, 'VIP', '1+2', 1, 1, 1),
-(9, 'Normal', '2+2', 1, 0, 0);
+(8, 'VIP', '1+2', 1, 1, 1),
+(9, 'Normal', '2+2', 1, 0, 0),
+(10, 'Normal', '2+2', 1, 0, 0);
 

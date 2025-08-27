@@ -5,7 +5,9 @@ require('dotenv').config();
 
 exports.getProfile = async (req, res) => {
     const userProfile = { ...req.user };
-    userProfile.password = undefined; 
+    userProfile.password = undefined;
+    console.log('this is user info')
+    console.log(userProfile) 
     res.status(200).json({
         status: 'success',
         data: {

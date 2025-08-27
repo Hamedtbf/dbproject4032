@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const redisClient = require('../config/redisClient');
-const dbPool = require('../config/db'); // Import the shared pool
+const dbPool = require('../config/db');
 require('dotenv').config();
 
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
