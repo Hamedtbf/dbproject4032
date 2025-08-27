@@ -2,8 +2,13 @@ const mysql = require('mysql2/promise');
 const redisClient = require('../config/redisClient');
 require('dotenv').config();
 
-const dbPool = mysql.createPool({ host: process.env.DB_HOST, user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: process.env.DB_NAME });
-
+const dbPool = mysql.createPool({ 
+    host: process.env.DB_HOST, 
+    user: process.env.DB_USER, 
+    password: process.env.DB_PASSWORD, 
+    database: process.env.DB_NAME,
+    timezone: 'Z' // This forces all connections to use UTC
+});
 
 exports.getProfile = async (req, res) => {
     const userProfile = { ...req.user };
