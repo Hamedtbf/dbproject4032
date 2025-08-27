@@ -4,11 +4,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { JalaliPipe } from '../../pipes/jalali-pipe';
+import { FormsModule } from '@angular/forms'; // Import FormsModule
 
 @Component({
   selector: 'app-reservations',
   standalone: true,
-  imports: [CommonModule, RouterLink, JalaliPipe],
+  imports: [CommonModule, RouterLink, JalaliPipe, FormsModule], // Add FormsModule
   templateUrl: './reservations.html',
   styleUrls: ['./reservations.css']
 })
@@ -16,6 +17,9 @@ export class Reservations implements OnInit {
   reservations: any[] = [];
   message = '';
   isLoading = true;
+
+  payingReservationId: number | null = null;
+  selectedMethod = 'کیف پول';
 
   constructor(private apiService: Api) {}
 
@@ -27,7 +31,6 @@ export class Reservations implements OnInit {
     this.isLoading = true;
     this.apiService.getReservations().subscribe({
       next: (res: any) => {
-        // Remove the filter to show all reservations
         this.reservations = res.data.reservations;
         this.isLoading = false;
       },
@@ -38,12 +41,19 @@ export class Reservations implements OnInit {
     });
   }
 
-  pay(reservationId: number) {
+  startPayment(reservationId: number) {
+    this.payingReservationId = reservationId;
     this.message = '';
-    this.apiService.makePayment(reservationId).subscribe({
+  }
+
+
+  confirmPayment() {
+    if (!this.payingReservationId) return;
+
+    this.apiService.makePayment(this.payingReservationId, this.selectedMethod).subscribe({
       next: () => {
         this.message = 'پرداخت با موفقیت انجام شد! بلیط شما به "سوابق خرید" منتقل شد.';
-        // Refresh the list to update the status
+        this.payingReservationId = null;
         this.loadReservations();
       },
       error: (err: HttpErrorResponse) => {

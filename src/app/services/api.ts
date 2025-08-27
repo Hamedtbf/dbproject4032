@@ -44,8 +44,8 @@ export class Api {
       return this.http.get(`${this.dashboardUrl}/reservations`, { withCredentials: true });
   }
 
-  makePayment(reservationId: number): Observable<any> {
-      return this.http.post(`${this.dashboardUrl}/payment`, { reservation_id: reservationId, method: 'balance' }, { withCredentials: true });
+  makePayment(reservationId: number, method: string): Observable<any> {
+      return this.http.post(`${this.dashboardUrl}/payment`, { reservation_id: reservationId, method: method }, { withCredentials: true });
   }
 
   getPaidTickets(): Observable<any> {

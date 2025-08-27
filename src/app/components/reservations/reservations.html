@@ -4,7 +4,7 @@
   </div>
 
   <h2>تاریخچه رزروها</h2>
-  <p>در این بخش می‌توانید تمام رزروهای خود، اعم از در انتظار پرداخت، پرداخت شده و لغو شده را مشاهده کنید.</p>
+  <p>در این بخش می‌توانید تمام رزروهای خود را مشاهده کنید.</p>
 
   <p *ngIf="message" class="message">{{ message }}</p>
 
@@ -29,11 +29,26 @@
         <td>{{ res.reserve_time | jalali }}</td>
         <td>{{ res.expire_time | jalali }}</td>
         <td>
-          <!-- Only show the "Pay" button if the status is 'reserved' -->
-          <button *ngIf="res.status === 'reserved'" (click)="pay(res.id)">پرداخت نهایی</button>
+          <button *ngIf="res.status === 'reserved'" (click)="startPayment(res.id)">پرداخت نهایی</button>
           <span *ngIf="res.status !== 'reserved'">--</span>
         </td>
       </tr>
     </tbody>
   </table>
+
+  <div class="modal-backdrop" *ngIf="payingReservationId">
+    <div class="modal">
+      <h3>انتخاب روش پرداخت</h3>
+      <p>لطفا روش پرداخت برای رزرو شماره {{ payingReservationId }} را انتخاب کنید.</p>
+      <div class="form-group">
+        <label for="paymentMethod">روش پرداخت</label>
+        <select id="paymentMethod" [(ngModel)]="selectedMethod">
+          <option value="کیف پول">کیف پول</option>
+          <option value="درگاه پرداخت">درگاه پرداخت</option>
+        </select>
+      </div>
+      <button (click)="confirmPayment()">تایید و پرداخت</button>
+      <button (click)="payingReservationId = null" class="secondary" style="margin-right: 10px;">انصراف</button>
+    </div>
+  </div>
 </div>
