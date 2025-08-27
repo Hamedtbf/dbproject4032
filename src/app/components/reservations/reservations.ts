@@ -27,8 +27,8 @@ export class Reservations implements OnInit {
     this.isLoading = true;
     this.apiService.getReservations().subscribe({
       next: (res: any) => {
-        // Filter to only show reservations that are pending payment
-        this.reservations = res.data.reservations.filter((r: any) => r.status === 'reserved');
+        // Remove the filter to show all reservations
+        this.reservations = res.data.reservations;
         this.isLoading = false;
       },
       error: (err: HttpErrorResponse) => {
@@ -43,7 +43,7 @@ export class Reservations implements OnInit {
     this.apiService.makePayment(reservationId).subscribe({
       next: () => {
         this.message = 'پرداخت با موفقیت انجام شد! بلیط شما به "سوابق خرید" منتقل شد.';
-        // Refresh the list to remove the paid reservation
+        // Refresh the list to update the status
         this.loadReservations();
       },
       error: (err: HttpErrorResponse) => {

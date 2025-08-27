@@ -3,14 +3,13 @@
     <button routerLink="/dashboard">بازگشت به داشبورد</button>
   </div>
 
-  <h2>رزروهای در انتظار پرداخت</h2>
-  <p>این بلیط‌ها برای مدت محدودی برای شما رزرو شده‌اند. لطفا برای نهایی کردن خرید، پرداخت را انجام دهید.</p>
+  <h2>تاریخچه رزروها</h2>
+  <p>در این بخش می‌توانید تمام رزروهای خود، اعم از در انتظار پرداخت، پرداخت شده و لغو شده را مشاهده کنید.</p>
 
-  <!-- Message Area -->
   <p *ngIf="message" class="message">{{ message }}</p>
 
   <div *ngIf="!reservations.length && !isLoading">
-    <p>شما هیچ رزرو در انتظار پرداختی ندارید.</p>
+    <p>شما هیچ رزروی ثبت نکرده‌اید.</p>
   </div>
 
   <table *ngIf="reservations.length > 0">
@@ -30,7 +29,9 @@
         <td>{{ res.reserve_time | jalali }}</td>
         <td>{{ res.expire_time | jalali }}</td>
         <td>
-          <button (click)="pay(res.id)">پرداخت نهایی</button>
+          <!-- Only show the "Pay" button if the status is 'reserved' -->
+          <button *ngIf="res.status === 'reserved'" (click)="pay(res.id)">پرداخت نهایی</button>
+          <span *ngIf="res.status !== 'reserved'">--</span>
         </td>
       </tr>
     </tbody>
