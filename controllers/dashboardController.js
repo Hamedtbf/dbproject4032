@@ -5,6 +5,17 @@ require('dotenv').config();
 const dbPool = mysql.createPool({ host: process.env.DB_HOST, user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: process.env.DB_NAME });
 
 
+exports.getProfile = async (req, res) => {
+    const userProfile = { ...req.user };
+    userProfile.password = undefined; 
+    res.status(200).json({
+        status: 'success',
+        data: {
+            user: userProfile
+        }
+    });
+};
+
 exports.editProfile = async (req, res) => {
     const { firstName, lastName, email, city } = req.body;
     const updateFields = {};
