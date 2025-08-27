@@ -41,3 +41,28 @@
 .modal h3 {
     margin-top: 0;
 }
+
+/* NEW: Styles for the facilities section */
+.facilities {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.facilities h4 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: #555;
+}
+
+.facilities ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.facilities li {
+  padding: 0.25rem 0;
+}
