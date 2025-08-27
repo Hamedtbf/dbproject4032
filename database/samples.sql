@@ -12,7 +12,7 @@ INSERT INTO Company (name) VALUES
 INSERT INTO Class (name) VALUES
 ('اقتصادی'), ('بیزنس'), ('VIP');
 INSERT INTO User (firstName, lastName, password, role, city, email, balance) VALUES
-('مدیر', 'سیستم', '$2a$12$Vyl.10g.Q2j8.e/2/G.iJ.uW/2.bL.zX.yW.vU.tS.rQ.pO.mN.o', 'admin', 'تهران', 'admin@example.com', 0);
+('مدیر', 'سیستم', '$2a$12$SG8oRRz4jJwg4f89xmNpzeQfXADlvUUsgEF3eG8JaiSww/.QeQDHa', 'admin', 'تهران', 'admin@example.com', 0);
 
 INSERT INTO Ticket (vehicle_type, source, destination, arrival_date, arrival_time, departure_date, departure_time, price, remaining_cap, company_id, class_id) VALUES
 ('flight', 'تهران', 'مشهد', '2025-09-10', '14:30:00', '2025-09-10', '13:00:00', 1200000, 25, 1, 2), -- Iran Air, Business
