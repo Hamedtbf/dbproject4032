@@ -1,0 +1,14 @@
+.message {
+    padding: 1rem;
+    background-color: #e2f0d9;
+    border: 1px solid #b6d7a8;
+    border-radius: 4px;
+    color: #3a7d24;
+    margin-bottom: 1rem;
+}
+
+/* Style for the disabled button */
+button.disabled {
+    background-color: #a9a9a9; /* Gray color */
+    cursor: not-allowed; /* Forbidden cursor icon */
+}

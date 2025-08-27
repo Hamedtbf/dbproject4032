@@ -1,0 +1,39 @@
+<div class="container">
+  <div class="nav">
+    <button routerLink="/dashboard">Back to Dashboard</button>
+  </div>
+
+  <h2>Edit Your Profile</h2>
+  <p>Only fill in the fields you wish to change.</p>
+
+  <p *ngIf="message" class="message">{{ message }}</p>
+  <p *ngIf="error" class="error">{{ error }}</p>
+
+  <div class="form-container" style="margin: 2rem 0;">
+    <div class="form-group">
+      <label for="firstName">First Name</label>
+      <input id="firstName" [(ngModel)]="editForm.firstName" [placeholder]="user?.firstName" (input)="onFormChange()">
+    </div>
+    <div class="form-group">
+      <label for="lastName">Last Name</label>
+      <input id="lastName" [(ngModel)]="editForm.lastName" [placeholder]="user?.lastName" (input)="onFormChange()">
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input id="email" type="email" [(ngModel)]="editForm.email" [placeholder]="user?.email" (input)="onFormChange()">
+    </div>
+    <div class="form-group">
+      <label for="city">City</label>
+      <input id="city" [(ngModel)]="editForm.city" [placeholder]="user?.city" (input)="onFormChange()">
+    </div>
+    <div class="form-group">
+      <label for="password">New Password</label>
+      <input id="password" type="password" [(ngModel)]="editForm.password" placeholder="Leave blank to keep current password" (input)="onFormChange()">
+    </div>
+
+    <!-- The button's disabled state and class are controlled by the isFormDirty variable -->
+    <button (click)="saveProfile()" [disabled]="!isFormDirty" [class.disabled]="!isFormDirty">
+      Save Changes
+    </button>
+  </div>
+</div>
