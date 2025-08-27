@@ -33,6 +33,7 @@
         <th>مقصد</th>
         <th>زمان حرکت</th>
         <th>قیمت (تومان)</th>
+        <th>کلاس</th> <!-- NEW: Added Class column header -->
         <th>ظرفیت باقی‌مانده</th>
         <th>عملیات</th>
       </tr>
@@ -43,6 +44,7 @@
         <td>{{ ticket.destination }}</td>
         <td>{{ ticket.departure_date | jalali }} ساعت {{ ticket.departure_time }}</td>
         <td>{{ ticket.price | number }}</td>
+        <td>{{ ticket.class_name }}</td> <!-- NEW: Added Class data cell -->
         <td>{{ ticket.remaining_cap }}</td>
         <td>
           <button (click)="viewDetails(ticket.id)">جزئیات</button>
