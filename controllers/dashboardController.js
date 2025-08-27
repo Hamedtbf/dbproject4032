@@ -118,7 +118,27 @@ exports.reserveTicket = async (req, res) => {
 exports.getReservations = async (req, res) => {
     try {
         await dbPool.query("UPDATE Reservation R JOIN Ticket T ON R.ticket_id = T.id SET R.status = 'canceled', T.remaining_cap = T.remaining_cap + 1 WHERE R.status = 'reserved' AND R.expire_time < NOW()");
-        const [reservations] = await dbPool.query('SELECT * FROM Reservation WHERE user_id = ? ORDER BY reserve_time DESC', [req.user.id]);
+        
+        const sql = `
+            SELECT 
+                r.id,
+                r.status,
+                r.reserve_time,
+                r.expire_time,
+                t.source,
+                t.destination,
+                t.departure_date,
+                t.departure_time,
+                t.price,
+                cl.name as class_name
+            FROM Reservation r
+            JOIN Ticket t ON r.ticket_id = t.id
+            JOIN Class cl ON t.class_id = cl.id
+            WHERE r.user_id = ? 
+            ORDER BY r.reserve_time DESC
+        `;
+        
+        const [reservations] = await dbPool.query(sql, [req.user.id]);
         res.status(200).json({ status: 'success', data: { reservations } });
     } catch (err) {
         res.status(500).json({ status: 'error', message: 'Failed to fetch reservations.', error: err.message });
