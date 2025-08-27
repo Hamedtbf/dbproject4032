@@ -1,25 +1,25 @@
 <div class="container">
   <div class="nav">
-    <button routerLink="/dashboard">Back to Dashboard</button>
+    <button routerLink="/dashboard">بازگشت به داشبورد</button>
   </div>
 
-  <h2>Search for Available Tickets</h2>
+  <h2>جستجوی بلیط‌های موجود</h2>
 
   <!-- Search Filter UI -->
   <div class="filters">
     <div class="form-group">
-      <label for="source">From</label>
-      <input id="source" [(ngModel)]="filters.source" placeholder="e.g., New York">
+      <label for="source">مبدا</label>
+      <input id="source" [(ngModel)]="filters.source" placeholder="مثال: تهران">
     </div>
     <div class="form-group">
-      <label for="destination">To</label>
-      <input id="destination" [(ngModel)]="filters.destination" placeholder="e.g., Boston">
+      <label for="destination">مقصد</label>
+      <input id="destination" [(ngModel)]="filters.destination" placeholder="مثال: شیراز">
     </div>
     <div class="form-group">
-      <label for="departure_date">Departure Date</label>
+      <label for="departure_date">تاریخ حرکت</label>
       <input id="departure_date" type="date" [(ngModel)]="filters.departure_date">
     </div>
-    <button (click)="search()">Search Tickets</button>
+    <button (click)="search()">جستجو</button>
   </div>
 
   <!-- Message Area -->
@@ -29,46 +29,43 @@
   <table *ngIf="tickets.length > 0">
     <thead>
       <tr>
-        <th>From</th>
-        <th>To</th>
-        <th>Departure</th>
-        <th>Price</th>
-        <th>Company</th>
-        <th>Remaining</th>
-        <th>Actions</th>
+        <th>مبدا</th>
+        <th>مقصد</th>
+        <th>زمان حرکت</th>
+        <th>قیمت (تومان)</th>
+        <th>شرکت</th>
+        <th>ظرفیت باقی‌مانده</th>
+        <th>عملیات</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let ticket of tickets">
         <td>{{ ticket.source }}</td>
         <td>{{ ticket.destination }}</td>
-        <td>{{ ticket.departure_date | date }} {{ ticket.departure_time }}</td>
-        <td>${{ ticket.price }}</td>
+        <td>{{ ticket.departure_date | jalali }} ساعت {{ ticket.departure_time }}</td>
+        <td>{{ ticket.price | number }}</td>
         <td>{{ ticket.company_name }}</td>
         <td>{{ ticket.remaining_cap }}</td>
         <td>
-          <button (click)="viewDetails(ticket.id)">Details</button>
-          <button (click)="reserve(ticket.id)">Reserve</button>
+          <button (click)="viewDetails(ticket.id)">جزئیات</button>
+          <button (click)="reserve(ticket.id)">رزرو</button>
         </td>
       </tr>
     </tbody>
   </table>
-  <p *ngIf="tickets.length === 0 && hasSearched">No tickets found for the selected criteria.</p>
+  <p *ngIf="tickets.length === 0 && hasSearched">بلیطی با این مشخصات یافت نشد.</p>
 
   <!-- Details Modal -->
   <div class="modal-backdrop" *ngIf="selectedTicketDetails">
     <div class="modal">
-      <h3>Ticket Details</h3>
-      <p><strong>Route:</strong> {{ selectedTicketDetails.source }} to {{ selectedTicketDetails.destination }}</p>
-      <p><strong>Company:</strong> {{ selectedTicketDetails.company_name }}</p>
-      <p><strong>Departure:</strong> {{ selectedTicketDetails.departure_date | date }} at {{ selectedTicketDetails.departure_time }}</p>
-      <p><strong>Arrival:</strong> {{ selectedTicketDetails.arrival_date | date }} at {{ selectedTicketDetails.arrival_time }}</p>
-      <p><strong>Price:</strong> ${{ selectedTicketDetails.price }}</p>
-      <p><strong>Vehicle:</strong> {{ selectedTicketDetails.vehicle_type }}</p>
-
-      <!-- Vehicle-specific details would go here if available -->
-
-      <button (click)="selectedTicketDetails = null" class="secondary">Close</button>
+      <h3>جزئیات بلیط</h3>
+      <p><strong>مسیر:</strong> {{ selectedTicketDetails.source }} به {{ selectedTicketDetails.destination }}</p>
+      <p><strong>شرکت:</strong> {{ selectedTicketDetails.company_name }}</p>
+      <p><strong>حرکت:</strong> {{ selectedTicketDetails.departure_date | jalali }} ساعت {{ selectedTicketDetails.departure_time }}</p>
+      <p><strong>ورود:</strong> {{ selectedTicketDetails.arrival_date | jalali }} ساعت {{ selectedTicketDetails.arrival_time }}</p>
+      <p><strong>قیمت:</strong> {{ selectedTicketDetails.price | number }} تومان</p>
+      <p><strong>وسیله:</strong> {{ selectedTicketDetails.vehicle_type }}</p>
+      <button (click)="selectedTicketDetails = null" class="secondary">بستن</button>
     </div>
   </div>
 </div>

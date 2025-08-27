@@ -4,11 +4,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { JalaliPipe } from '../../pipes/jalali-pipe';
 
 @Component({
   selector: 'app-admin-reservations',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, JalaliPipe],
   templateUrl: './admin-reservations.html',
   styleUrls: ['./admin-reservations.css']
 })
@@ -31,7 +32,7 @@ export class AdminReservations implements OnInit {
         this.isLoading = false;
       },
       error: (err: HttpErrorResponse) => {
-        this.message = err.error.message || 'Failed to load reservations.';
+        this.message = 'خطا در بارگذاری رزروها.';
         this.isLoading = false;
       }
     });
@@ -41,10 +42,10 @@ export class AdminReservations implements OnInit {
     this.message = '';
     this.apiService.adminUpdateReservation(id, status).subscribe({
       next: () => {
-        this.message = `Reservation #${id} status has been updated to '${status}'.`;
+        this.message = `وضعیت رزرو شماره ${id} با موفقیت به '${status}' تغییر یافت.`;
       },
       error: (err: HttpErrorResponse) => {
-        this.message = err.error.message || 'Failed to update reservation status.';
+        this.message = err.error.message || 'خطا در بروزرسانی وضعیت رزرو.';
       }
     });
   }

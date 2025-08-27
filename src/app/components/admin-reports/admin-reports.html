@@ -1,20 +1,20 @@
 <div class="container">
   <div class="nav">
-    <button routerLink="/admin">Back to Admin Panel</button>
+    <button routerLink="/admin">بازگشت به پنل مدیریت</button>
   </div>
 
-  <h2>Review User Reports</h2>
+  <h2>بررسی گزارش‌های کاربران</h2>
 
   <p *ngIf="message" class="message">{{ message }}</p>
 
   <table *ngIf="reports.length > 0 && !selectedReport">
     <thead>
       <tr>
-        <th>Report ID</th>
-        <th>User ID</th>
-        <th>Category</th>
-        <th>Status</th>
-        <th>Actions</th>
+        <th>شماره گزارش</th>
+        <th>شناسه کاربر</th>
+        <th>دسته بندی</th>
+        <th>وضعیت</th>
+        <th>عملیات</th>
       </tr>
     </thead>
     <tbody>
@@ -24,39 +24,39 @@
         <td>{{ report.category }}</td>
         <td>{{ report.status }}</td>
         <td>
-          <button (click)="viewReport(report)">View & Respond</button>
+          <button (click)="viewReport(report)">مشاهده و پاسخ</button>
         </td>
       </tr>
     </tbody>
   </table>
-  <p *ngIf="!reports.length && !isLoading">There are no reports to review.</p>
+  <p *ngIf="!reports.length && !isLoading">هیچ گزارشی برای بررسی وجود ندارد.</p>
 
   <!-- Report Details & Response Form -->
   <div *ngIf="selectedReport" class="report-details">
-    <h3>Details for Report #{{ selectedReport.id }}</h3>
-    <p><strong>User ID:</strong> {{ selectedReport.user_id }}</p>
-    <p><strong>Reservation ID:</strong> {{ selectedReport.reservation_id }}</p>
-    <p><strong>Category:</strong> {{ selectedReport.category }}</p>
-    <p><strong>Status:</strong> {{ selectedReport.status }}</p>
-    <p><strong>User's Description:</strong></p>
+    <h3>جزئیات گزارش شماره {{ selectedReport.id }}</h3>
+    <p><strong>شناسه کاربر:</strong> {{ selectedReport.user_id }}</p>
+    <p><strong>شماره رزرو:</strong> {{ selectedReport.reservation_id }}</p>
+    <p><strong>دسته بندی:</strong> {{ selectedReport.category }}</p>
+    <p><strong>وضعیت فعلی:</strong> {{ selectedReport.status }}</p>
+    <p><strong>توضیحات کاربر:</strong></p>
     <blockquote class="description">{{ selectedReport.description }}</blockquote>
 
     <hr>
 
-    <h4>Respond to Report</h4>
+    <h4>پاسخ به گزارش</h4>
     <div class="form-group">
-      <label for="status">Update Status</label>
+      <label for="status">تغییر وضعیت</label>
       <select id="status" [(ngModel)]="responseForm.status">
-        <option value="pending">pending</option>
-        <option value="in_progress">in_progress</option>
-        <option value="resolved">resolved</option>
+        <option value="pending">در انتظار بررسی</option>
+        <option value="in_progress">در حال بررسی</option>
+        <option value="resolved">حل شده</option>
       </select>
     </div>
     <div class="form-group">
-      <label for="response">Your Response</label>
-      <textarea id="response" rows="4" [(ngModel)]="responseForm.response" placeholder="Enter your official response here..."></textarea>
+      <label for="response">پاسخ شما</label>
+      <textarea id="response" rows="4" [(ngModel)]="responseForm.response" placeholder="پاسخ رسمی خود را اینجا وارد کنید..."></textarea>
     </div>
-    <button (click)="submitResponse()">Submit Response</button>
-    <button (click)="selectedReport = null" class="secondary" style="margin-left: 10px;">Back to List</button>
+    <button (click)="submitResponse()">ارسال پاسخ</button>
+    <button (click)="selectedReport = null" class="secondary" style="margin-right: 10px;">بازگشت به لیست</button>
   </div>
 </div>

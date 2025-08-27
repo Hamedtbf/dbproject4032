@@ -1,14 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { Api } from '../../services/api';
 import { HttpErrorResponse } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { JalaliPipe } from '../../pipes/jalali-pipe';
 
 @Component({
   selector: 'app-tickets',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    JalaliPipe,
+    DecimalPipe
+  ],
   templateUrl: './tickets.html',
   styleUrls: ['./tickets.css']
 })
@@ -37,7 +44,7 @@ export class Tickets implements OnInit {
         this.tickets = res.data.tickets;
       },
       error: (err: HttpErrorResponse) => {
-        this.message = err.error.message || 'Failed to fetch tickets.';
+        this.message = 'خطا در دریافت بلیط‌ها.';
       }
     });
   }
@@ -49,7 +56,7 @@ export class Tickets implements OnInit {
         this.selectedTicketDetails = res.data.ticket;
       },
       error: (err: HttpErrorResponse) => {
-        this.message = err.error.message || 'Failed to fetch ticket details.';
+        this.message = 'خطا در دریافت جزئیات بلیط.';
       }
     });
   }
@@ -58,11 +65,11 @@ export class Tickets implements OnInit {
     this.message = '';
     this.apiService.reserveTicket(id).subscribe({
       next: () => {
-        this.message = 'Ticket reserved successfully! Please go to "My Pending Reservations" to complete the payment.';
+        this.message = 'بلیط با موفقیت رزرو شد! لطفا برای پرداخت به بخش "رزروهای در انتظار پرداخت" مراجعه کنید.';
         this.search();
       },
       error: (err: HttpErrorResponse) => {
-        this.message = err.error.message || 'Failed to reserve ticket.';
+        this.message = err.error.message || 'خطا در رزرو بلیط.';
       }
     });
   }

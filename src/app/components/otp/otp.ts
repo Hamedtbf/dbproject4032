@@ -30,6 +30,7 @@ export class Otp implements OnInit {
     this.authService.verifyOtp({ email: this.email, otp: this.otp }).subscribe({
       next: (res: any) => {
         localStorage.removeItem('userEmailForOTP');
+
         if (res.data.role === 'admin') {
           this.router.navigate(['/admin']);
         } else {
@@ -37,7 +38,7 @@ export class Otp implements OnInit {
         }
       },
       error: (err: HttpErrorResponse) => {
-        this.error = err.error.message || 'OTP verification failed. Please try again.';
+        this.error = err.error.message || 'تایید کد با خطا مواجه شد. لطفا دوباره تلاش کنید.';
       }
     });
   }

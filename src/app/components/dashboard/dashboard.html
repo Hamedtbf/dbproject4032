@@ -1,16 +1,77 @@
-<div class="container">
-  <h2>User Dashboard</h2>
-  <p>Welcome! From here you can manage your trips.</p>
+<div class="dashboard-container" dir="rtl">
+  <header class="dashboard__header">
+    <div class="header-content">
+      <h1 class="dashboard__title">داشبورد کاربری</h1>
+      <p class="dashboard__subtitle">به سامانه رزرو بلیط خوش آمدید</p>
+    </div>
+    <div *ngIf="user" class="user-info">
+      <span>{{ user.firstName }} عزیز</span>
+      <span class="balance">موجودی: {{ user.balance | currency:'IRR':'symbol-narrow':'1.0-0' }}</span>
+      <button (click)="logout()" class="logout-button">خروج</button>
+    </div>
+  </header>
 
-  <div class="nav">
-    <button routerLink="/tickets">Search for Tickets</button>
-    <button routerLink="/reservations">My Pending Reservations</button>
-    <button routerLink="/buys">My Purchase History</button>
-    <button (click)="logout()" class="secondary">Logout</button>
-  </div>
+  <nav class="actions">
+    <!-- ویرایش پروفایل -->
+    <a class="card" routerLink="/profile" aria-label="ویرایش پروفایل">
+      <div class="card__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+          <path d="M18.5 14.5l2 2L19 18l-2-2 1.5-1.5z"></path>
+        </svg>
+      </div>
+      <div class="card__body">
+        <h2 class="card__title">پروفایل من</h2>
+      </div>
+      <span class="card__chevron" aria-hidden="true">›</span>
+    </a>
 
-  <div class="content">
-    <!-- You could add summary information or welcome messages here in the future -->
-    <p>Select an option above to get started.</p>
-  </div>
+    <!-- جستجوی بلیط -->
+    <a class="card" routerLink="/tickets" aria-label="جستجوی بلیط">
+      <div class="card__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </div>
+      <div class="card__body">
+        <h2 class="card__title">جستجوی بلیط</h2>
+      </div>
+      <span class="card__chevron" aria-hidden="true">›</span>
+    </a>
+
+    <!-- رزروهای در انتظار پرداخت -->
+    <a class="card" routerLink="/reservations" aria-label="رزروهای در انتظار پرداخت">
+      <div class="card__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path>
+          <path d="M12 6v6l4 2"></path>
+        </svg>
+      </div>
+      <div class="card__body">
+        <h2 class="card__title">رزروهای در انتظار پرداخت</h2>
+      </div>
+      <span class="card__chevron" aria-hidden="true">›</span>
+    </a>
+
+    <!-- سوابق خرید -->
+    <a class="card" routerLink="/buys" aria-label="سوابق خرید">
+      <div class="card__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M9 3h6a2 2 0 0 1 2 2v1h1a2 2 0 0 1 2 2v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V8a2 2 0 0 1 2-2h1V5a2 2 0 0 1 2-2z"></path>
+          <path d="M9 5h6"></path>
+          <polyline points="9 14 11 16 15 12"></polyline>
+        </svg>
+      </div>
+      <div class="card__body">
+        <h2 class="card__title">سوابق خرید</h2>
+      </div>
+      <span class="card__chevron" aria-hidden="true">›</span>
+    </a>
+  </nav>
+
+  <footer class="dashboard__footer" aria-hidden="true">
+    <small>© سامانه رزرو بلیط</small>
+  </footer>
 </div>

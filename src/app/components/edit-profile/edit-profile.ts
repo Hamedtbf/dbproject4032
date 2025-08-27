@@ -35,7 +35,7 @@ export class EditProfile implements OnInit {
         this.user = res.data.user;
       },
       error: (err: HttpErrorResponse) => {
-        this.error = 'Could not load your profile data.';
+        this.error = 'خطا در بارگذاری اطلاعات پروفایل.';
       }
     });
   }
@@ -56,7 +56,7 @@ export class EditProfile implements OnInit {
 
     this.apiService.editProfile(payload).subscribe({
       next: () => {
-        this.message = 'Profile updated successfully!';
+        this.message = 'پروفایل با موفقیت بروزرسانی شد!';
         this.error = '';
         // Reset the form and button state after successful save
         this.editForm = { firstName: '', lastName: '', email: '', city: '', password: '' };
@@ -65,7 +65,7 @@ export class EditProfile implements OnInit {
         this.ngOnInit();
       },
       error: (err: HttpErrorResponse) => {
-        this.error = err.error.message || 'Failed to update profile.';
+        this.error = err.error.message || 'خطا در بروزرسانی پروفایل.';
         this.message = '';
       }
     });

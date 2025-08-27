@@ -32,7 +32,7 @@ export class Signup {
         this.router.navigate(['/verify-otp']);
       },
       error: (err: HttpErrorResponse) => {
-        this.error = err.error.message || 'Signup failed. Please try again.';
+        this.error = err.error.message || 'ثبت نام با خطا مواجه شد. لطفا دوباره تلاش کنید.';
       }
     });
   }

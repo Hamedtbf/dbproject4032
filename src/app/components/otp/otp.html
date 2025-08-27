@@ -1,13 +1,13 @@
 <div class="form-container">
-  <h2>Two-Factor Authentication</h2>
-  <p>For demonstration purposes, the OTP has been logged to your **back-end server's console**.</p>
+  <h2>احراز هویت دو عاملی</h2>
+  <p>برای اهداف آزمایشی، کد تایید یکبار مصرف در کنسول ترمینال بک‌اند شما نمایش داده شده است.</p>
 
   <div class="form-group">
-    <label for="otp">Enter OTP</label>
+    <label for="otp">کد تایید را وارد کنید</label>
     <input id="otp" type="text" [(ngModel)]="otp" name="otp" required>
   </div>
 
-  <button (click)="verifyOtp()">Verify</button>
+  <button (click)="verifyOtp()">تایید کد</button>
 
   <p *ngIf="error" class="error">{{ error }}</p>
 </div>

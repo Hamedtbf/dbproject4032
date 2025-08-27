@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { Api } from '../../services/api';
 import { HttpErrorResponse } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { JalaliPipe } from '../../pipes/jalali-pipe';
 
 @Component({
   selector: 'app-buys',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, JalaliPipe, DecimalPipe],
   templateUrl: './buys.html',
   styleUrls: ['./buys.css']
 })
@@ -16,6 +17,8 @@ export class Buys implements OnInit {
   boughtTickets: any[] = [];
   message = '';
   isLoading = true;
+
+  // State for the report form
   reportingTicket: any = null;
   report = {
     category: 'delay',
@@ -36,25 +39,27 @@ export class Buys implements OnInit {
         this.isLoading = false;
       },
       error: (err: HttpErrorResponse) => {
-        this.message = err.error.message || 'Failed to load purchase history.';
+        this.message = 'خطا در بارگذاری سوابق خرید.';
         this.isLoading = false;
       }
     });
   }
 
   cancel(reservationId: number) {
-    if (confirm('Are you sure you want to cancel this ticket? A penalty may apply.')) {
+    if (confirm('آیا از لغو این بلیط اطمینان دارید؟ ممکن است شامل جریمه شود.')) {
       this.apiService.cancelTicket(reservationId).subscribe({
         next: (res: any) => {
-          this.message = `Ticket canceled successfully. Refund amount: $${res.data.refundAmount}`;
-          this.loadBoughtTickets();
+          this.message = `بلیط با موفقیت لغو شد. مبلغ ${res.data.refundAmount} تومان به حساب شما بازگردانده شد.`;
+          this.loadBoughtTickets(); // Refresh the list
         },
         error: (err: HttpErrorResponse) => {
-          this.message = err.error.message || 'Failed to cancel ticket.';
+          this.message = err.error.message || 'خطا در لغو بلیط.';
         }
       });
     }
   }
+
+  // --- Report Methods ---
 
   showReportForm(ticket: any) {
     this.reportingTicket = ticket;
@@ -68,21 +73,23 @@ export class Buys implements OnInit {
 
   submitReport() {
     if (!this.report.description) {
-      this.message = 'Please provide a description for your report.';
+      this.message = 'لطفا توضیحات گزارش خود را وارد کنید.';
       return;
     }
+
     const reportData = {
       reservation_id: this.reportingTicket.reservation_id,
       category: this.report.category,
       description: this.report.description
     };
+
     this.apiService.createReport(reportData).subscribe({
       next: () => {
-        this.message = 'Your report has been submitted successfully.';
+        this.message = 'گزارش شما با موفقیت ثبت شد.';
         this.closeReportForm();
       },
       error: (err: HttpErrorResponse) => {
-        this.message = err.error.message || 'Failed to submit report.';
+        this.message = err.error.message || 'خطا در ثبت گزارش.';
       }
     });
   }

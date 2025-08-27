@@ -16,6 +16,7 @@ export class AdminReports implements OnInit {
   reports: any[] = [];
   message = '';
   isLoading = true;
+
   selectedReport: any = null;
   responseForm = {
     status: 'pending',
@@ -36,7 +37,7 @@ export class AdminReports implements OnInit {
         this.isLoading = false;
       },
       error: (err: HttpErrorResponse) => {
-        this.message = err.error.message || 'Failed to load reports.';
+        this.message = 'خطا در بارگذاری گزارش‌ها.';
         this.isLoading = false;
       }
     });
@@ -44,6 +45,7 @@ export class AdminReports implements OnInit {
 
   viewReport(report: any) {
     this.selectedReport = report;
+    // Pre-fill the form with the report's current data
     this.responseForm.status = report.status;
     this.responseForm.response = report.response || '';
     this.message = '';
@@ -51,14 +53,17 @@ export class AdminReports implements OnInit {
 
   submitResponse() {
     if (!this.selectedReport) return;
+
     this.apiService.adminUpdateReport(this.selectedReport.id, this.responseForm.status, this.responseForm.response).subscribe({
       next: () => {
-        this.message = `Report #${this.selectedReport.id} has been updated.`;
+        this.message = `گزارش شماره ${this.selectedReport.id} با موفقیت بروزرسانی شد.`;
+        // Go back to the list view
         this.selectedReport = null;
+        // Refresh the list to show the new status
         this.loadReports();
       },
       error: (err: HttpErrorResponse) => {
-        this.message = err.error.message || 'Failed to update report.';
+        this.message = err.error.message || 'خطا در بروزرسانی گزارش.';
       }
     });
   }

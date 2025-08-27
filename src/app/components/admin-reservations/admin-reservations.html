@@ -1,21 +1,21 @@
 <div class="container">
   <div class="nav">
-    <button routerLink="/admin">Back to Admin Panel</button>
+    <button routerLink="/admin">بازگشت به پنل مدیریت</button>
   </div>
 
-  <h2>Manage All User Reservations</h2>
+  <h2>مدیریت تمام رزروها</h2>
 
   <p *ngIf="message" class="message">{{ message }}</p>
 
   <table *ngIf="reservations.length > 0">
     <thead>
       <tr>
-        <th>Res ID</th>
-        <th>User ID</th>
-        <th>Ticket ID</th>
-        <th>Status</th>
-        <th>Reserve Time</th>
-        <th>Actions</th>
+        <th>شماره رزرو</th>
+        <th>شناسه کاربر</th>
+        <th>شناسه بلیط</th>
+        <th>وضعیت</th>
+        <th>زمان رزرو</th>
+        <th>عملیات</th>
       </tr>
     </thead>
     <tbody>
@@ -24,19 +24,18 @@
         <td>{{ res.user_id }}</td>
         <td>{{ res.ticket_id }}</td>
         <td>
-          <!-- Bind the select dropdown to the reservation's status -->
           <select [(ngModel)]="res.status">
-            <option value="reserved">reserved</option>
-            <option value="paid">paid</option>
-            <option value="canceled">canceled</option>
+            <option value="reserved">رزرو شده</option>
+            <option value="paid">پرداخت شده</option>
+            <option value="canceled">لغو شده</option>
           </select>
         </td>
-        <td>{{ res.reserve_time | date:'medium' }}</td>
+        <td>{{ res.reserve_time | jalali }}</td>
         <td>
-          <button (click)="updateStatus(res.id, res.status)">Save Change</button>
+          <button (click)="updateStatus(res.id, res.status)">ذخیره تغییر</button>
         </td>
       </tr>
     </tbody>
   </table>
-   <p *ngIf="!reservations.length && !isLoading">No reservations found.</p>
+   <p *ngIf="!reservations.length && !isLoading">هیچ رزروی یافت نشد.</p>
 </div>

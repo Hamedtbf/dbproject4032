@@ -28,7 +28,7 @@ export class Login {
         this.router.navigate(['/verify-otp']);
       },
       error: (err: HttpErrorResponse) => {
-        this.error = err.error.message || 'Login failed. Please check your credentials.';
+        this.error = err.error.message || 'ورود با خطا مواجه شد. لطفا اطلاعات خود را بررسی کنید.';
       }
     });
   }

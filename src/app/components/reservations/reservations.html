@@ -1,37 +1,36 @@
 <div class="container">
   <div class="nav">
-    <button routerLink="/dashboard">Back to Dashboard</button>
+    <button routerLink="/dashboard">بازگشت به داشبورد</button>
   </div>
 
-  <h2>My Pending Reservations</h2>
-  <p>These tickets are held for you for a limited time. Please complete the payment to confirm your booking.</p>
+  <h2>رزروهای در انتظار پرداخت</h2>
+  <p>این بلیط‌ها برای مدت محدودی برای شما رزرو شده‌اند. لطفا برای نهایی کردن خرید، پرداخت را انجام دهید.</p>
 
   <!-- Message Area -->
   <p *ngIf="message" class="message">{{ message }}</p>
 
-  <div *ngIf="!reservations.length">
-    <p>You have no pending reservations.</p>
+  <div *ngIf="!reservations.length && !isLoading">
+    <p>شما هیچ رزرو در انتظار پرداختی ندارید.</p>
   </div>
 
-  <table *ngIf="reservations.length">
+  <table *ngIf="reservations.length > 0">
     <thead>
       <tr>
-        <th>Reservation ID</th>
-        <th>Status</th>
-        <th>Reserved At</th>
-        <th>Expires At</th>
-        <th>Actions</th>
+        <th>شماره رزرو</th>
+        <th>وضعیت</th>
+        <th>زمان رزرو</th>
+        <th>زمان انقضا</th>
+        <th>عملیات</th>
       </tr>
     </thead>
     <tbody>
-      <!-- We only show reservations with the status 'reserved' -->
       <tr *ngFor="let res of reservations">
         <td>{{ res.id }}</td>
         <td>{{ res.status }}</td>
-        <td>{{ res.reserve_time | date:'medium' }}</td>
-        <td>{{ res.expire_time | date:'medium' }}</td>
+        <td>{{ res.reserve_time | jalali }}</td>
+        <td>{{ res.expire_time | jalali }}</td>
         <td>
-          <button (click)="pay(res.id)">Pay Now</button>
+          <button (click)="pay(res.id)">پرداخت نهایی</button>
         </td>
       </tr>
     </tbody>
