@@ -17,12 +17,17 @@ exports.getProfile = async (req, res) => {
 };
 
 exports.editProfile = async (req, res) => {
-    const { firstName, lastName, email, city } = req.body;
+    const { firstName, lastName, email, city, password } = req.body;
     const updateFields = {};
+
     if (firstName) updateFields.firstName = firstName;
     if (lastName) updateFields.lastName = lastName;
     if (email) updateFields.email = email;
     if (city) updateFields.city = city;
+    if (password) {
+        updateFields.password = await bcrypt.hash(password, 12);
+    }
+
     if (Object.keys(updateFields).length === 0) {
         return res.status(400).json({ status: 'fail', message: 'No fields to update provided.' });
     }
@@ -30,6 +35,9 @@ exports.editProfile = async (req, res) => {
         await dbPool.query('UPDATE User SET ? WHERE id = ?', [updateFields, req.user.id]);
         res.status(200).json({ status: 'success', message: 'Profile updated successfully.' });
     } catch (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({ status: 'fail', message: 'This email is already in use by another account.' });
+        }
         res.status(500).json({ status: 'error', message: 'Failed to update profile.', error: err.message });
     }
 };
