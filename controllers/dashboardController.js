@@ -65,9 +65,9 @@ exports.getTickets = async (req, res) => {
     const cacheKey = `tickets:${JSON.stringify(queryParams)}`;
     try {
         const cachedResults = await redisClient.get(cacheKey);
-        if (cachedResults) {
-            return res.status(200).json({ status: 'success', source: 'cache', data: JSON.parse(cachedResults) });
-        }
+        // if (cachedResults) {
+        //     return res.status(200).json({ status: 'success', source: 'cache', data: JSON.parse(cachedResults) });
+        // }
         let sql = 'SELECT T.*, C.name as company_name, CL.name as class_name FROM Ticket T JOIN Company C ON T.company_id = C.id JOIN Class CL ON T.class_id = CL.id WHERE T.remaining_cap > 0';
         const params = [];
         if (queryParams.source) { sql += ' AND T.source = ?'; params.push(queryParams.source); }
@@ -75,7 +75,7 @@ exports.getTickets = async (req, res) => {
         if (queryParams.departure_date) { sql += ' AND T.departure_date = ?'; params.push(queryParams.departure_date); }
         if (queryParams.vehicle_type) { sql += ' AND T.vehicle_type = ?'; params.push(queryParams.vehicle_type); }
         const [tickets] = await dbPool.query(sql, params);
-        await redisClient.setEx(cacheKey, 300, JSON.stringify(tickets));
+        // await redisClient.setEx(cacheKey, 300, JSON.stringify(tickets));
         res.status(200).json({ status: 'success', source: 'database', data: { tickets } });
     } catch (err) {
         res.status(500).json({ status: 'error', message: 'Failed to fetch tickets.', error: err.message });
