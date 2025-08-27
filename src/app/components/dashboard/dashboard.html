@@ -6,7 +6,7 @@
     </div>
     <div *ngIf="user" class="user-info">
       <span>{{ user.firstName }} عزیز</span>
-      <span class="balance">موجودی: {{ user.balance | currency:'IRR':'symbol-narrow':'1.0-0' }}</span>
+      <span class="balance">موجودی: {{ user.balance | number:'1.0-0' }} تومان</span>
       <button (click)="logout()" class="logout-button">خروج</button>
     </div>
   </header>
