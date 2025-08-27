@@ -22,10 +22,8 @@
     <button (click)="search()">جستجو</button>
   </div>
 
-  <!-- Message Area -->
   <p *ngIf="message" class="message">{{ message }}</p>
 
-  <!-- Tickets Results Table -->
   <table *ngIf="tickets.length > 0">
     <thead>
       <tr>
@@ -33,7 +31,7 @@
         <th>مقصد</th>
         <th>زمان حرکت</th>
         <th>قیمت (تومان)</th>
-        <th>کلاس</th> <!-- NEW: Added Class column header -->
+        <th>کلاس</th>
         <th>ظرفیت باقی‌مانده</th>
         <th>عملیات</th>
       </tr>
@@ -44,7 +42,7 @@
         <td>{{ ticket.destination }}</td>
         <td>{{ ticket.departure_date | jalali }} ساعت {{ ticket.departure_time }}</td>
         <td>{{ ticket.price | number }}</td>
-        <td>{{ ticket.class_name }}</td> <!-- NEW: Added Class data cell -->
+        <td>{{ ticket.class_name }}</td> 
         <td>{{ ticket.remaining_cap }}</td>
         <td>
           <button (click)="viewDetails(ticket.id)">جزئیات</button>
@@ -55,7 +53,6 @@
   </table>
   <p *ngIf="tickets.length === 0 && hasSearched">بلیطی با این مشخصات یافت نشد.</p>
 
-  <!-- Details Modal -->
   <div class="modal-backdrop" *ngIf="selectedTicketDetails">
     <div class="modal">
       <h3>جزئیات بلیط</h3>
@@ -65,7 +62,6 @@
       <p><strong>قیمت:</strong> {{ selectedTicketDetails.price | number }} تومان</p>
       <p><strong>وسیله:</strong> {{ selectedTicketDetails.vehicle_type }}</p>
 
-      <!-- NEW: Vehicle-specific details section -->
       <div *ngIf="selectedTicketDetails.details" class="facilities">
         <h4>امکانات و مشخصات</h4>
         <!-- Train Details -->

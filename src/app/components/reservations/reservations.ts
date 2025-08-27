@@ -4,12 +4,12 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { JalaliPipe } from '../../pipes/jalali-pipe';
-import { FormsModule } from '@angular/forms'; // Import FormsModule
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-reservations',
   standalone: true,
-  imports: [CommonModule, RouterLink, JalaliPipe, FormsModule], // Add FormsModule
+  imports: [CommonModule, RouterLink, JalaliPipe, FormsModule],
   templateUrl: './reservations.html',
   styleUrls: ['./reservations.css']
 })

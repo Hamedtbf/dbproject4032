@@ -7,13 +7,10 @@ import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    // This makes the router available throughout the application
     provideRouter(routes),
 
-    // This is required to use HttpClient in our services for API calls
     importProvidersFrom(HttpClientModule),
 
-    // This is required to use ngModel for two-way data binding in our forms
     importProvidersFrom(FormsModule)
   ]
 };

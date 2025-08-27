@@ -11,13 +11,11 @@ export class Api {
 
   constructor(private http: HttpClient) { }
 
-  // --- Dashboard APIs ---
 
   getProfile(): Observable<any> {
     return this.http.get(`${this.dashboardUrl}/profile`, { withCredentials: true });
   }
 
-  // NEW: Add a method to update the user's profile
   editProfile(profileData: any): Observable<any> {
     return this.http.put(`${this.dashboardUrl}/editprofile`, profileData, { withCredentials: true });
   }

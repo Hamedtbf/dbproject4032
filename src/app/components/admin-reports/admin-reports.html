@@ -31,7 +31,6 @@
   </table>
   <p *ngIf="!reports.length && !isLoading">هیچ گزارشی برای بررسی وجود ندارد.</p>
 
-  <!-- Report Details & Response Form -->
   <div *ngIf="selectedReport" class="report-details">
     <h3>جزئیات گزارش شماره {{ selectedReport.id }}</h3>
     <p><strong>شناسه کاربر:</strong> {{ selectedReport.user_id }}</p>

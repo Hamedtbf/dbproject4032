@@ -17,8 +17,8 @@
 
 .description {
     background-color: #fff;
-    border-right: 4px solid #007bff; /* Changed border-left to border-right for RTL */
+    border-right: 4px solid #007bff;
     padding: 1rem;
-    margin-right: 0; /* Changed margin-left to margin-right for RTL */
+    margin-right: 0;
     font-style: italic;
 }

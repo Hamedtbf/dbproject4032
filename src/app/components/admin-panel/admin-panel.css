@@ -1,3 +1,1 @@
-/* Inherits all styles from the dashboard component. */
-/* We can reuse the same CSS for a consistent look. */
 @import '../dashboard/dashboard.css';

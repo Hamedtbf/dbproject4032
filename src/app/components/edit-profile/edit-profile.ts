@@ -13,7 +13,7 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrls: ['./edit-profile.css']
 })
 export class EditProfile implements OnInit {
-  user: any = null; // To hold the current user data for placeholders
+  user: any = null;
   editForm = {
     firstName: '',
     lastName: '',
@@ -22,14 +22,13 @@ export class EditProfile implements OnInit {
     password: ''
   };
 
-  isFormDirty = false; // Controls the button state
+  isFormDirty = false;
   message = '';
   error = '';
 
   constructor(private apiService: Api) {}
 
   ngOnInit() {
-    // Load the user's current profile data when the page loads
     this.apiService.getProfile().subscribe({
       next: (res: any) => {
         this.user = res.data.user;
@@ -40,13 +39,11 @@ export class EditProfile implements OnInit {
     });
   }
 
-  // This function is called every time the user types in an input
   onFormChange() {
     this.isFormDirty = true;
   }
 
   saveProfile() {
-    // Create a payload with only the fields that the user has actually filled in
     const payload: any = {};
     if (this.editForm.firstName) payload.firstName = this.editForm.firstName;
     if (this.editForm.lastName) payload.lastName = this.editForm.lastName;
@@ -58,10 +55,10 @@ export class EditProfile implements OnInit {
       next: () => {
         this.message = 'پروفایل با موفقیت بروزرسانی شد!';
         this.error = '';
-        // Reset the form and button state after successful save
+
         this.editForm = { firstName: '', lastName: '', email: '', city: '', password: '' };
         this.isFormDirty = false;
-        // Reload the user data to update the placeholders
+        
         this.ngOnInit();
       },
       error: (err: HttpErrorResponse) => {
