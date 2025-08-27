@@ -15,19 +15,23 @@
   <table *ngIf="reservations.length > 0">
     <thead>
       <tr>
-        <th>شماره رزرو</th>
+        <th>مبدا</th>
+        <th>مقصد</th>
+        <th>زمان حرکت</th>
+        <th>قیمت</th>
+        <th>کلاس</th>
         <th>وضعیت</th>
-        <th>زمان رزرو</th>
-        <th>زمان انقضا</th>
         <th>عملیات</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let res of reservations">
-        <td>{{ res.id }}</td>
+        <td>{{ res.source }}</td>
+        <td>{{ res.destination }}</td>
+        <td>{{ res.departure_date | jalali }}</td>
+        <td>{{ res.price | number }} تومان</td>
+        <td>{{ res.class_name }}</td>
         <td>{{ res.status }}</td>
-        <td>{{ res.reserve_time | jalali }}</td>
-        <td>{{ res.expire_time | jalali }}</td>
         <td>
           <button *ngIf="res.status === 'reserved'" (click)="startPayment(res.id)">پرداخت نهایی</button>
           <span *ngIf="res.status !== 'reserved'">--</span>
