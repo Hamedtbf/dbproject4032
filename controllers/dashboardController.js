@@ -1,14 +1,7 @@
-const mysql = require('mysql2/promise');
+const bcrypt = require('bcryptjs');
 const redisClient = require('../config/redisClient');
+const dbPool = require('../config/db');
 require('dotenv').config();
-
-const dbPool = mysql.createPool({ 
-    host: process.env.DB_HOST, 
-    user: process.env.DB_USER, 
-    password: process.env.DB_PASSWORD, 
-    database: process.env.DB_NAME,
-    timezone: 'Z' // This forces all connections to use UTC
-});
 
 exports.getProfile = async (req, res) => {
     const userProfile = { ...req.user };
@@ -64,7 +57,7 @@ exports.getTickets = async (req, res) => {
     const queryParams = req.query;
     const cacheKey = `tickets:${JSON.stringify(queryParams)}`;
     try {
-        const cachedResults = await redisClient.get(cacheKey);
+        // const cachedResults = await redisClient.get(cacheKey);
         // if (cachedResults) {
         //     return res.status(200).json({ status: 'success', source: 'cache', data: JSON.parse(cachedResults) });
         // }

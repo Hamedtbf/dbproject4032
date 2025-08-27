@@ -1,15 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
-const mysql = require('mysql2/promise');
+const dbPool = require('../config/db'); // Import the shared pool
 require('dotenv').config();
-
-// Re-create a minimal pool config for this file to use
-const dbPool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-});
 
 exports.protect = async (req, res, next) => {
     let token;

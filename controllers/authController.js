@@ -1,10 +1,8 @@
-const mysql = require('mysql2/promise');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const redisClient = require('../config/redisClient');
+const dbPool = require('../config/db'); // Import the shared pool
 require('dotenv').config();
-
-const dbPool = mysql.createPool({ host: process.env.DB_HOST, user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: process.env.DB_NAME });
 
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
 const signToken = id => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
