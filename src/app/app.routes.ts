@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
-// Import all the components we created
+import { authGuard } from './guards/auth-guard';
+
 import { Login } from './components/login/login';
 import { Signup } from './components/signup/signup';
 import { Otp } from './components/otp/otp';
@@ -11,20 +12,20 @@ import { Buys } from './components/buys/buys';
 import { AdminPanel } from './components/admin-panel/admin-panel';
 import { AdminReservations } from './components/admin-reservations/admin-reservations';
 import { AdminReports } from './components/admin-reports/admin-reports';
+import { EditProfile } from './components/edit-profile/edit-profile';
 
 export const routes: Routes = [
-  // Redirect the base URL to the login page
   { path: '', redirectTo: '/login', pathMatch: 'full' },
 
-  // Define the path for each component
   { path: 'login', component: Login },
   { path: 'signup', component: Signup },
   { path: 'verify-otp', component: Otp },
-  { path: 'dashboard', component: Dashboard },
-  { path: 'tickets', component: Tickets },
-  { path: 'reservations', component: Reservations },
-  { path: 'buys', component: Buys },
-  { path: 'admin', component: AdminPanel },
-  { path: 'admin/reservations', component: AdminReservations },
-  { path: 'admin/reports', component: AdminReports },
+
+  { path: 'dashboard', component: Dashboard, canActivate: [authGuard] },
+  { path: 'tickets', component: Tickets, canActivate: [authGuard] },
+  { path: 'reservations', component: Reservations, canActivate: [authGuard] },
+  { path: 'buys', component: Buys, canActivate: [authGuard] },
+  { path: 'admin', component: AdminPanel, canActivate: [authGuard] },
+  { path: 'admin/reservations', component: AdminReservations, canActivate: [authGuard] },
+  { path: 'admin/reports', component: AdminReports, canActivate: [authGuard] },
 ];
