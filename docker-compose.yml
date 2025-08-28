@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  # --- INFRASTRUCTURE SERVICES ---
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-ticket-db
+    restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: Mysql2025
+      MYSQL_DATABASE: ticket_reservation
+    ports:
+      - "3306:3306"
+    volumes:
+      # - mysql-data:/var/lib/mysql
+      - ./database/tables.sql:/docker-entrypoint-initdb.d/1.sql
+      - ./database/samples.sql:/docker-entrypoint-initdb.d/2.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  redis-cache:
+    image: redis:7-alpine
+    container_name: redis-ticket-cache
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    # volumes:
+    #   - redis-data:/data
+
+  elasticsearch:
+    image: elasticsearch:8.17.10
+    container_name: elasticsearch-ticket-db
+    restart: unless-stopped
+    environment:
+      - "discovery.type=single-node"
+      - "xpack.security.enabled=false"
+    ports:
+      - "9200:9200"
+    # volumes:
+    #   - es-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -vq '\"status\":\"red\"'"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+
+  # --- DATA SYNC SERVICE ---
+  es-syncer:
+    build:
+      context: ./backend
+    container_name: es-syncer
+    command: node scripts/sync.js
+    environment:
+      - DB_HOST=mysql-db
+      - DB_USER=root
+      - DB_PASSWORD=Mysql2025
+      - DB_NAME=ticket_reservation
+      - ES_HOST=http://elasticsearch:9200
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+
+  # --- APPLICATION SERVICES ---
+  backend:
+    build:
+      context: ./backend
+    container_name: backend-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=mysql-db
+      - DB_USER=root
+      - DB_PASSWORD=Mysql2025
+      - DB_NAME=ticket_reservation
+      - REDIS_HOST=redis-cache
+      - REDIS_PORT=6379
+      - ES_HOST=http://elasticsearch:9200
+      - JWT_SECRET=this-is-a-super-secret-key-change-it
+      - JWT_EXPIRES_IN=90d
+      - OTP_TTL_SECONDS=300
+    depends_on:
+      es-syncer:
+        condition: service_completed_successfully
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend-ui
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+
+# volumes:
+#   mysql-data:
+#   redis-data:
+#   es-data:
