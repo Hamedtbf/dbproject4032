@@ -1,15 +1,12 @@
 const redis = require('redis');
 require('dotenv').config();
 
-// Create the Redis client instance
 const redisClient = redis.createClient({
-    url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
+    url: `redis://${process.env.REDIS_HOST || '127.0.0.1'}:${process.env.REDIS_PORT || 6379}`
 });
 
 redisClient.on('error', (err) => console.error('Redis Client Error', err));
 
-// Connect to Redis as soon as this file is loaded
 redisClient.connect();
 
-// Export the single, connected client
 module.exports = redisClient;

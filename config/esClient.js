@@ -1,6 +1,6 @@
 const { Client } = require('@elastic/elasticsearch');
+require('dotenv').config();
 
-// Create and export a single, shared Elasticsearch client instance
-const esClient = new Client({ node: 'http://localhost:9200' });
+const esClient = new Client({ node: process.env.ES_HOST || 'http://localhost:9200' });
 
 module.exports = esClient;
