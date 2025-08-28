@@ -1,7 +1,9 @@
 const bcrypt = require('bcryptjs');
-const redisClient = require('../config/redisClient');
 const dbPool = require('../config/db');
-require('dotenv').config();
+const esClient = require('../config/esClient');
+const indexName = 'tickets'; // Define the index name once
+
+// Note: Redis client is removed as it's no longer used for ticket caching here.
 
 exports.getProfile = async (req, res) => {
     const userProfile = { ...req.user };
@@ -54,24 +56,36 @@ exports.getCities = async (req, res) => {
 };
 
 exports.getTickets = async (req, res) => {
-    const queryParams = req.query;
-    const cacheKey = `tickets:${JSON.stringify(queryParams)}`;
+    const { source, destination, departure_date, vehicle_type } = req.query;
+    
     try {
-        // const cachedResults = await redisClient.get(cacheKey);
-        // if (cachedResults) {
-        //     return res.status(200).json({ status: 'success', source: 'cache', data: JSON.parse(cachedResults) });
-        // }
-        let sql = 'SELECT T.*, C.name as company_name, CL.name as class_name FROM Ticket T JOIN Company C ON T.company_id = C.id JOIN Class CL ON T.class_id = CL.id WHERE T.remaining_cap > 0';
-        const params = [];
-        if (queryParams.source) { sql += ' AND T.source = ?'; params.push(queryParams.source); }
-        if (queryParams.destination) { sql += ' AND T.destination = ?'; params.push(queryParams.destination); }
-        if (queryParams.departure_date) { sql += ' AND T.departure_date = ?'; params.push(queryParams.departure_date); }
-        if (queryParams.vehicle_type) { sql += ' AND T.vehicle_type = ?'; params.push(queryParams.vehicle_type); }
-        const [tickets] = await dbPool.query(sql, params);
-        // await redisClient.setEx(cacheKey, 300, JSON.stringify(tickets));
-        res.status(200).json({ status: 'success', source: 'database', data: { tickets } });
+        const mustClauses = [
+            { range: { remaining_cap: { gt: 0 } } }
+        ];
+
+        if (source) mustClauses.push({ term: { 'source': source } });
+        if (destination) mustClauses.push({ term: { 'destination': destination } });
+        if (departure_date) mustClauses.push({ term: { 'departure_date': departure_date } });
+        if (vehicle_type) mustClauses.push({ term: { 'vehicle_type': vehicle_type } });
+        
+        const result = await esClient.search({
+            index: indexName,
+            body: {
+                query: {
+                    bool: {
+                        must: mustClauses
+                    }
+                },
+                size: 100
+            }
+        });
+
+        const tickets = result.hits.hits.map(hit => hit._source);
+        res.status(200).json({ status: 'success', source: 'elasticsearch', data: { tickets } });
+
     } catch (err) {
-        res.status(500).json({ status: 'error', message: 'Failed to fetch tickets.', error: err.message });
+        console.error("Elasticsearch search error:", err.meta?.body || err);
+        res.status(500).json({ status: 'error', message: 'Failed to fetch tickets.' });
     }
 };
 
@@ -103,8 +117,22 @@ exports.reserveTicket = async (req, res) => {
             await connection.rollback();
             return res.status(400).json({ status: 'fail', message: 'Ticket is no longer available.' });
         }
-        await connection.query('UPDATE Ticket SET remaining_cap = remaining_cap - 1 WHERE id = ?', [ticket_id]);
+
+        // 1. Update MySQL
+        const newCapacity = ticketRows[0].remaining_cap - 1;
+        // FIXED: Use the 'newCapacity' variable in the query
+        await connection.query('UPDATE Ticket SET remaining_cap = ? WHERE id = ?', [newCapacity, ticket_id]);
         await connection.query('INSERT INTO Reservation (user_id, ticket_id) VALUES (?, ?)', [req.user.id, ticket_id]);
+        
+        // 2. Sync the change to Elasticsearch
+        await esClient.update({
+            index: indexName,
+            id: ticket_id,
+            body: {
+                doc: { remaining_cap: newCapacity }
+            }
+        });
+        
         await connection.commit();
         res.status(201).json({ status: 'success', message: 'Ticket reserved successfully for 10 minutes.' });
     } catch (err) {
@@ -117,19 +145,30 @@ exports.reserveTicket = async (req, res) => {
 
 exports.getReservations = async (req, res) => {
     try {
+        const [expiredReservations] = await dbPool.query("SELECT ticket_id FROM Reservation WHERE status = 'reserved' AND expire_time < NOW()");
+        
+        // 1. Update MySQL
         await dbPool.query("UPDATE Reservation R JOIN Ticket T ON R.ticket_id = T.id SET R.status = 'canceled', T.remaining_cap = T.remaining_cap + 1 WHERE R.status = 'reserved' AND R.expire_time < NOW()");
         
+        // 2. Sync the changes to Elasticsearch for each expired ticket
+        for (const reservation of expiredReservations) {
+            await esClient.update({
+                index: indexName,
+                id: reservation.ticket_id,
+                body: {
+                    script: {
+                        source: "ctx._source.remaining_cap++",
+                        lang: "painless"
+                    }
+                }
+            });
+        }
+        
+        // FIXED: Added the correct SQL query to fetch reservation details
         const sql = `
             SELECT 
-                r.id,
-                r.status,
-                r.reserve_time,
-                r.expire_time,
-                t.source,
-                t.destination,
-                t.departure_date,
-                t.departure_time,
-                t.price,
+                r.id, r.status, r.reserve_time, r.expire_time,
+                t.source, t.destination, t.departure_date, t.departure_time, t.price,
                 cl.name as class_name
             FROM Reservation r
             JOIN Ticket t ON r.ticket_id = t.id
@@ -200,10 +239,24 @@ exports.cancelTicket = async (req, res) => {
         const departureDateTime = new Date(`${ticket.departure_date.toISOString().split('T')[0]}T${ticket.departure_time}`);
         const penaltyRate = calculatePenalty(departureDateTime);
         const refundAmount = ticket.price * (1 - penaltyRate);
+        
+        // FIXED: Added the missing MySQL update logic
         await connection.query('UPDATE Ticket SET remaining_cap = remaining_cap + 1 WHERE id = ?', [reservation.ticket_id]);
         await connection.query("UPDATE Reservation SET status = 'canceled' WHERE id = ?", [reservation_id]);
         await connection.query("UPDATE Payment SET status = 'returned' WHERE reservation_id = ?", [reservation_id]);
         await connection.query('UPDATE User SET balance = balance + ? WHERE id = ?', [refundAmount, req.user.id]);
+        
+        await esClient.update({
+            index: indexName,
+            id: reservation.ticket_id,
+            body: {
+                script: {
+                    source: "ctx._source.remaining_cap++",
+                    lang: "painless"
+                }
+            }
+        });
+        
         await connection.commit();
         res.status(200).json({ status: 'success', message: 'Ticket canceled successfully.', data: { refundAmount } });
     } catch (err) {
