@@ -10,10 +10,13 @@ const adminRouter = require('./routes/adminRoutes');
 
 const app = express();
 
-app.use(cors({
-    origin: 'http://localhost:4200', // Allow Angular front-end
-    credentials: true
-}));
+const corsOptions = {
+  origin: 'http://localhost:8080', // The origin of your Angular app
+  credentials: true, // This allows cookies to be sent
+  optionsSuccessStatus: 200 // For legacy browser support
+};
+app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use(cookieParser());
 
