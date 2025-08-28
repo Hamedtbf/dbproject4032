@@ -1,0 +1,61 @@
+<div class="container">
+  <div class="nav">
+    <button routerLink="/admin">بازگشت به پنل مدیریت</button>
+  </div>
+
+  <h2>بررسی گزارش‌های کاربران</h2>
+
+  <p *ngIf="message" class="message">{{ message }}</p>
+
+  <table *ngIf="reports.length > 0 && !selectedReport">
+    <thead>
+      <tr>
+        <th>شماره گزارش</th>
+        <th>شناسه کاربر</th>
+        <th>دسته بندی</th>
+        <th>وضعیت</th>
+        <th>عملیات</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let report of reports">
+        <td>{{ report.id }}</td>
+        <td>{{ report.user_id }}</td>
+        <td>{{ report.category }}</td>
+        <td>{{ report.status }}</td>
+        <td>
+          <button (click)="viewReport(report)">مشاهده و پاسخ</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p *ngIf="!reports.length && !isLoading">هیچ گزارشی برای بررسی وجود ندارد.</p>
+
+  <div *ngIf="selectedReport" class="report-details">
+    <h3>جزئیات گزارش شماره {{ selectedReport.id }}</h3>
+    <p><strong>شناسه کاربر:</strong> {{ selectedReport.user_id }}</p>
+    <p><strong>شماره رزرو:</strong> {{ selectedReport.reservation_id }}</p>
+    <p><strong>دسته بندی:</strong> {{ selectedReport.category }}</p>
+    <p><strong>وضعیت فعلی:</strong> {{ selectedReport.status }}</p>
+    <p><strong>توضیحات کاربر:</strong></p>
+    <blockquote class="description">{{ selectedReport.description }}</blockquote>
+
+    <hr>
+
+    <h4>پاسخ به گزارش</h4>
+    <div class="form-group">
+      <label for="status">تغییر وضعیت</label>
+      <select id="status" [(ngModel)]="responseForm.status">
+        <option value="pending">در انتظار بررسی</option>
+        <option value="in_progress">در حال بررسی</option>
+        <option value="resolved">حل شده</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="response">پاسخ شما</label>
+      <textarea id="response" rows="4" [(ngModel)]="responseForm.response" placeholder="پاسخ رسمی خود را اینجا وارد کنید..."></textarea>
+    </div>
+    <button (click)="submitResponse()">ارسال پاسخ</button>
+    <button (click)="selectedReport = null" class="secondary" style="margin-right: 10px;">بازگشت به لیست</button>
+  </div>
+</div>

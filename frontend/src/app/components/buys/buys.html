@@ -1,0 +1,60 @@
+<div class="container">
+  <div class="nav">
+    <button routerLink="/dashboard">بازگشت به داشبورد</button>
+  </div>
+
+  <h2>سوابق خرید</h2>
+
+  <p *ngIf="message" class="message">{{ message }}</p>
+
+  <div *ngIf="!boughtTickets.length && !isLoading">
+    <p>شما تاکنون هیچ بلیطی خریداری نکرده‌اید.</p>
+  </div>
+
+  <table *ngIf="boughtTickets.length > 0">
+    <thead>
+      <tr>
+        <th>مبدا</th>
+        <th>مقصد</th>
+        <th>زمان حرکت</th>
+        <th>قیمت</th>
+        <th>تاریخ خرید</th>
+        <th>عملیات</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let ticket of boughtTickets">
+        <td>{{ ticket.source }}</td>
+        <td>{{ ticket.destination }}</td>
+        <td>{{ ticket.departure_date | jalali }}</td>
+        <td>{{ ticket.price | number }} تومان</td>
+        <td>{{ ticket.payment_time | jalali }}</td>
+        <td>
+          <button (click)="cancel(ticket.reservation_id)">لغو و استرداد وجه</button>
+          <button (click)="showReportForm(ticket)" class="secondary">ثبت گزارش</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="modal-backdrop" *ngIf="reportingTicket">
+    <div class="modal">
+      <h3>ثبت گزارش برای بلیط: {{ reportingTicket.source }} به {{ reportingTicket.destination }}</h3>
+      <div class="form-group">
+        <label for="category">دسته بندی</label>
+        <select id="category" [(ngModel)]="report.category">
+          <option value="delay">تاخیر</option>
+          <option value="payment_issue">مشکل در پرداخت</option>
+          <option value="cancellation">مشکل در لغو بلیط</option>
+          <option value="other">سایر موارد</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="description">توضیحات</label>
+        <textarea id="description" rows="4" [(ngModel)]="report.description" placeholder="لطفا مشکل خود را با جزئیات شرح دهید."></textarea>
+      </div>
+      <button (click)="submitReport()">ارسال گزارش</button>
+      <button (click)="closeReportForm()" class="secondary" style="margin-right: 10px;">انصراف</button>
+    </div>
+  </div>
+</div>

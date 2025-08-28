@@ -1,0 +1,102 @@
+<div class="container">
+  <div class="nav">
+    <button routerLink="/dashboard">بازگشت به داشبورد</button>
+  </div>
+
+  <h2>جستجوی بلیط‌های موجود</h2>
+
+  <!-- Search Filter UI -->
+  <div class="filters">
+    <div class="form-group">
+      <label for="source">مبدا</label>
+      <input id="source" [(ngModel)]="filters.source" placeholder="مثال: تهران">
+    </div>
+    <div class="form-group">
+      <label for="destination">مقصد</label>
+      <input id="destination" [(ngModel)]="filters.destination" placeholder="مثال: شیراز">
+    </div>
+    <div class="form-group">
+      <label for="departure_date">تاریخ حرکت</label>
+      <input id="departure_date" type="date" [(ngModel)]="filters.departure_date">
+    </div>
+    <button (click)="search()">جستجو</button>
+  </div>
+
+  <p *ngIf="message" class="message">{{ message }}</p>
+
+  <table *ngIf="tickets.length > 0">
+    <thead>
+      <tr>
+        <th>مبدا</th>
+        <th>مقصد</th>
+        <th>زمان حرکت</th>
+        <th>قیمت (تومان)</th>
+        <th>کلاس</th>
+        <th>ظرفیت باقی‌مانده</th>
+        <th>عملیات</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let ticket of tickets">
+        <td>{{ ticket.source }}</td>
+        <td>{{ ticket.destination }}</td>
+        <td>{{ ticket.departure_date | jalali }} ساعت {{ ticket.departure_time }}</td>
+        <td>{{ ticket.price | number }}</td>
+        <td>{{ ticket.class_name }}</td> 
+        <td>{{ ticket.remaining_cap }}</td>
+        <td>
+          <button (click)="viewDetails(ticket.id)">جزئیات</button>
+          <button (click)="reserve(ticket.id)">رزرو</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p *ngIf="tickets.length === 0 && hasSearched">بلیطی با این مشخصات یافت نشد.</p>
+
+  <div class="modal-backdrop" *ngIf="selectedTicketDetails">
+    <div class="modal">
+      <h3>جزئیات بلیط</h3>
+      <p><strong>مسیر:</strong> {{ selectedTicketDetails.source }} به {{ selectedTicketDetails.destination }}</p>
+      <p><strong>حرکت:</strong> {{ selectedTicketDetails.departure_date | jalali }} ساعت {{ selectedTicketDetails.departure_time }}</p>
+      <p><strong>ورود:</strong> {{ selectedTicketDetails.arrival_date | jalali }} ساعت {{ selectedTicketDetails.arrival_time }}</p>
+      <p><strong>قیمت:</strong> {{ selectedTicketDetails.price | number }} تومان</p>
+      <p><strong>وسیله:</strong> {{ selectedTicketDetails.vehicle_type }}</p>
+
+      <div *ngIf="selectedTicketDetails.details" class="facilities">
+        <h4>امکانات و مشخصات</h4>
+        <!-- Train Details -->
+        <div *ngIf="selectedTicketDetails.vehicle_type === 'train'">
+          <ul>
+            <li><strong>ستاره قطار:</strong> {{ selectedTicketDetails.details.stars }}</li>
+            <li><strong>تختخواب:</strong> {{ selectedTicketDetails.details.has_bed ? 'دارد' : 'ندارد' }}</li>
+            <li><strong>سرویس پذیرایی:</strong> {{ selectedTicketDetails.details.has_service ? 'دارد' : 'ندارد' }}</li>
+            <li><strong>اینترنت:</strong> {{ selectedTicketDetails.details.has_internet ? 'دارد' : 'ندارد' }}</li>
+            <li><strong>تهویه:</strong> {{ selectedTicketDetails.details.has_condition ? 'دارد' : 'ندارد' }}</li>
+          </ul>
+        </div>
+        <!-- Flight Details -->
+        <div *ngIf="selectedTicketDetails.vehicle_type === 'flight'">
+          <ul>
+            <li><strong>کلاس پرواز:</strong> {{ selectedTicketDetails.details.flight_class }}</li>
+            <li><strong>تعداد توقف:</strong> {{ selectedTicketDetails.details.stops }}</li>
+            <li><strong>شماره پرواز:</strong> {{ selectedTicketDetails.details.flight_number }}</li>
+            <li><strong>فرودگاه مبدا:</strong> {{ selectedTicketDetails.details.source_airport }}</li>
+            <li><strong>فرودگاه مقصد:</strong> {{ selectedTicketDetails.details.destination_airport }}</li>
+          </ul>
+        </div>
+        <!-- Bus Details -->
+        <div *ngIf="selectedTicketDetails.vehicle_type === 'bus'">
+          <ul>
+            <li><strong>کلاس اتوبوس:</strong> {{ selectedTicketDetails.details.bus_class }}</li>
+            <li><strong>چیدمان صندلی:</strong> {{ selectedTicketDetails.details.seats_in_row }}</li>
+            <li><strong>تهویه:</strong> {{ selectedTicketDetails.details.has_condition ? 'دارد' : 'ندارد' }}</li>
+            <li><strong>سرویس پذیرایی:</strong> {{ selectedTicketDetails.details.has_service ? 'دارد' : 'ندارد' }}</li>
+            <li><strong>مانیتور:</strong> {{ selectedTicketDetails.details.has_monitor ? 'دارد' : 'ندارد' }}</li>
+          </ul>
+        </div>
+      </div>
+      
+      <button (click)="selectedTicketDetails = null" class="secondary">بستن</button>
+    </div>
+  </div>
+</div>
