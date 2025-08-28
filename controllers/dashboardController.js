@@ -3,7 +3,6 @@ const dbPool = require('../config/db');
 const esClient = require('../config/esClient');
 const indexName = 'tickets'; // Define the index name once
 
-// Note: Redis client is removed as it's no longer used for ticket caching here.
 
 exports.getProfile = async (req, res) => {
     const userProfile = { ...req.user };
@@ -71,6 +70,9 @@ exports.getTickets = async (req, res) => {
         const result = await esClient.search({
             index: indexName,
             body: {
+                sort: [
+                    { departure_date: { order: "asc" } }
+                ],
                 query: {
                     bool: {
                         must: mustClauses
@@ -118,16 +120,14 @@ exports.reserveTicket = async (req, res) => {
             return res.status(400).json({ status: 'fail', message: 'Ticket is no longer available.' });
         }
 
-        // 1. Update MySQL
         const newCapacity = ticketRows[0].remaining_cap - 1;
-        // FIXED: Use the 'newCapacity' variable in the query
         await connection.query('UPDATE Ticket SET remaining_cap = ? WHERE id = ?', [newCapacity, ticket_id]);
         await connection.query('INSERT INTO Reservation (user_id, ticket_id) VALUES (?, ?)', [req.user.id, ticket_id]);
         
-        // 2. Sync the change to Elasticsearch
         await esClient.update({
             index: indexName,
             id: ticket_id,
+            refresh: true,
             body: {
                 doc: { remaining_cap: newCapacity }
             }
@@ -147,14 +147,13 @@ exports.getReservations = async (req, res) => {
     try {
         const [expiredReservations] = await dbPool.query("SELECT ticket_id FROM Reservation WHERE status = 'reserved' AND expire_time < NOW()");
         
-        // 1. Update MySQL
         await dbPool.query("UPDATE Reservation R JOIN Ticket T ON R.ticket_id = T.id SET R.status = 'canceled', T.remaining_cap = T.remaining_cap + 1 WHERE R.status = 'reserved' AND R.expire_time < NOW()");
         
-        // 2. Sync the changes to Elasticsearch for each expired ticket
         for (const reservation of expiredReservations) {
             await esClient.update({
                 index: indexName,
                 id: reservation.ticket_id,
+                refresh: true,
                 body: {
                     script: {
                         source: "ctx._source.remaining_cap++",
@@ -164,7 +163,6 @@ exports.getReservations = async (req, res) => {
             });
         }
         
-        // FIXED: Added the correct SQL query to fetch reservation details
         const sql = `
             SELECT 
                 r.id, r.status, r.reserve_time, r.expire_time,
@@ -176,7 +174,7 @@ exports.getReservations = async (req, res) => {
             WHERE r.user_id = ? 
             ORDER BY r.reserve_time DESC
         `;
-        
+
         const [reservations] = await dbPool.query(sql, [req.user.id]);
         res.status(200).json({ status: 'success', data: { reservations } });
     } catch (err) {
@@ -240,15 +238,16 @@ exports.cancelTicket = async (req, res) => {
         const penaltyRate = calculatePenalty(departureDateTime);
         const refundAmount = ticket.price * (1 - penaltyRate);
         
-        // FIXED: Added the missing MySQL update logic
         await connection.query('UPDATE Ticket SET remaining_cap = remaining_cap + 1 WHERE id = ?', [reservation.ticket_id]);
         await connection.query("UPDATE Reservation SET status = 'canceled' WHERE id = ?", [reservation_id]);
         await connection.query("UPDATE Payment SET status = 'returned' WHERE reservation_id = ?", [reservation_id]);
         await connection.query('UPDATE User SET balance = balance + ? WHERE id = ?', [refundAmount, req.user.id]);
         
+        // FIXED: Add refresh: true
         await esClient.update({
             index: indexName,
             id: reservation.ticket_id,
+            refresh: true,
             body: {
                 script: {
                     source: "ctx._source.remaining_cap++",
